@@ -1,0 +1,99 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/hooks/use-translation';
+import { useState } from 'react';
+import { MobileMenu } from './mobile-menu';
+
+export function Navbar() {
+  const pathname = usePathname();
+  const { t, locale, setLocale } = useTranslation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navLinks = [
+    { href: '/services', label: t('nav.services') },
+    { href: '/providers', label: t('nav.providers') },
+    { href: '/how-it-works', label: t('nav.how_it_works') },
+    { href: '/for-providers', label: t('nav.for_providers') },
+  ];
+
+  const toggleLanguage = () => {
+    setLocale(locale === 'en' ? 'es' : 'en');
+  };
+
+  return (
+    <>
+      <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xl">E</span>
+              </div>
+              <span className="text-xl font-bold text-gray-900">EcuaCasa</span>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`font-medium transition-colors hover:text-primary-600 ${
+                    pathname === link.href
+                      ? 'text-primary-600'
+                      : 'text-gray-600'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+
+            {/* Right Side Actions */}
+            <div className="flex items-center gap-3">
+              {/* Language Toggle */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleLanguage}
+                className="hidden sm:flex font-medium text-gray-700 hover:text-primary-600"
+              >
+                {locale === 'en' ? 'ES' : 'EN'}
+              </Button>
+
+              {/* Admin Link - Only show when authenticated */}
+              {/* TODO: Add auth check in Phase 7 */}
+              {/* <Link href="/admin">
+                <Button variant="ghost" size="sm" className="hidden lg:flex">
+                  {t('nav.admin')}
+                </Button>
+              </Link> */}
+
+              {/* Mobile Menu Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Menu */}
+      <MobileMenu
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        navLinks={navLinks}
+      />
+    </>
+  );
+}

@@ -1,0 +1,111 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/hooks/use-translation';
+import { useEffect } from 'react';
+
+interface MobileMenuProps {
+  open: boolean;
+  onClose: () => void;
+  navLinks: { href: string; label: string }[];
+}
+
+export function MobileMenu({ open, onClose, navLinks }: MobileMenuProps) {
+  const pathname = usePathname();
+  const { t, locale, setLocale } = useTranslation();
+
+  // Close menu on route change
+  useEffect(() => {
+    onClose();
+  }, [pathname, onClose]);
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [open]);
+
+  if (!open) return null;
+
+  const toggleLanguage = () => {
+    setLocale(locale === 'en' ? 'es' : 'en');
+  };
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/50 z-50 md:hidden"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Slide-out Menu */}
+      <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-white z-50 md:hidden shadow-xl">
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200">
+            <Link href="/" className="flex items-center gap-2" onClick={onClose}>
+              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xl">E</span>
+              </div>
+              <span className="text-xl font-bold text-gray-900">EcuaCasa</span>
+            </Link>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="flex-1 px-4 py-6">
+            <ul className="space-y-1">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={`block px-4 py-3 rounded-lg font-medium transition-colors ${
+                      pathname === link.href
+                        ? 'bg-primary-50 text-primary-700'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Footer Actions */}
+          <div className="px-4 py-6 border-t border-gray-200 space-y-3">
+            {/* Language Toggle */}
+            <Button
+              variant="outline"
+              className="w-full justify-center"
+              onClick={toggleLanguage}
+            >
+              {locale === 'en' ? '🇪🇸 Español' : '🇺🇸 English'}
+            </Button>
+
+            {/* Admin Link - Only show when authenticated */}
+            {/* TODO: Add auth check in Phase 7 */}
+            {/* <Link href="/admin">
+              <Button variant="outline" className="w-full">
+                {t('nav.admin')}
+              </Button>
+            </Link> */}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
