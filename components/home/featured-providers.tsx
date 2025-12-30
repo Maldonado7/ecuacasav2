@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,7 +8,8 @@ import { RatingStars } from '@/components/shared/rating-stars';
 import { WhatsAppButton } from '@/components/shared/whatsapp-button';
 import { useTranslation } from '@/hooks/use-translation';
 import { getLocalizedField } from '@/lib/i18n/helpers';
-import { CheckCircle, MapPin, Clock } from 'lucide-react';
+import { getProviderPlaceholder, getBlurDataURL } from '@/lib/utils/placeholders';
+import { CheckCircle, Clock } from 'lucide-react';
 
 interface Provider {
   id: string;
@@ -39,7 +41,7 @@ export function FeaturedProviders({ providers }: FeaturedProvidersProps) {
   const { t, locale } = useTranslation();
 
   return (
-    <section className="py-16 sm:py-20 bg-white">
+    <section className="py-16 sm:py-20 bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -52,76 +54,71 @@ export function FeaturedProviders({ providers }: FeaturedProvidersProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {providers.map((provider) => (
-            <Card key={provider.id} className="hover:shadow-lg transition-shadow duration-200">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <Link href={`/providers/${provider.slug}`}>
-                      <h3 className="text-xl font-semibold text-gray-900 hover:text-primary-600 transition-colors">
-                        {provider.name}
-                      </h3>
-                    </Link>
-                    <div className="flex items-center gap-2 mt-2">
-                      <RatingStars rating={provider.rating} size="sm" showValue />
-                      <span className="text-sm text-gray-500">
-                        ({provider.review_count})
-                      </span>
-                    </div>
-                  </div>
-                  {provider.verified && (
-                    <CheckCircle className="w-5 h-5 text-primary-600 flex-shrink-0" />
-                  )}
-                </div>
-
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                  {getLocalizedField(provider, 'description', locale)}
-                </p>
-
-                <div className="space-y-2 mb-4">
-                  {provider.services.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {provider.services.slice(0, 2).map((service, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs">
-                          {getLocalizedField(service, 'name', locale)}
-                        </Badge>
-                      ))}
-                      {provider.services.length > 2 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{provider.services.length - 2}
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-4 text-xs text-gray-500">
-                    {provider.neighborhoods.length > 0 && (
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        <span>{provider.neighborhoods[0].name}</span>
+            <Card key={provider.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-accent-200">
+              <CardContent className="p-0">
+                {/* Provider Photo */}
+                <Link href={`/providers/${provider.slug}`}>
+                  <div className="relative h-48 w-full bg-gradient-to-br from-primary-50 to-blue-100 overflow-hidden">
+                    <Image
+                      src={getProviderPlaceholder(provider.name)}
+                      alt={provider.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      placeholder="blur"
+                      blurDataURL={getBlurDataURL()}
+                    />
+                    {/* Verified Badge Overlay */}
+                    {provider.verified && (
+                      <div className="absolute top-3 right-3 bg-success text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-medium shadow-lg">
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        {t('providers.verified')}
                       </div>
                     )}
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      <span>{provider.response_time}</span>
-                    </div>
-                    <span className="font-medium">{provider.price_range}</span>
                   </div>
-                </div>
+                </Link>
 
-                <div className="flex items-center gap-2">
-                  {provider.speaks_english && (
-                    <Badge variant="outline" className="text-xs border-primary-300 text-primary-700">
-                      {t('providers.speaks_english')}
-                    </Badge>
-                  )}
-                  {provider.verified && (
-                    <Badge variant="outline" className="text-xs border-green-300 text-green-700">
-                      {t('providers.verified')}
-                    </Badge>
-                  )}
-                </div>
+                {/* Content */}
+                <div className="p-5">
+                  <Link href={`/providers/${provider.slug}`}>
+                    <h3 className="text-xl font-bold text-gray-900 hover:text-accent-600 transition-colors mb-2">
+                      {provider.name}
+                    </h3>
+                  </Link>
 
-                <div className="mt-4 pt-4 border-t border-gray-200">
+                  {/* Primary Service */}
+                  {provider.services.length > 0 && (
+                    <p className="text-sm text-gray-600 mb-3">
+                      {getLocalizedField(provider.services[0], 'name', locale)}
+                      {provider.services.length > 1 && ` +${provider.services.length - 1}`}
+                    </p>
+                  )}
+
+                  {/* Key Stats - Only 5 data points */}
+                  <div className="space-y-2 mb-4">
+                    {/* Rating */}
+                    <div className="flex items-center gap-2">
+                      <RatingStars rating={provider.rating} size="sm" showValue />
+                      <span className="text-sm text-gray-500">({provider.review_count})</span>
+                    </div>
+
+                    {/* Response Time & Price */}
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-1.5 text-gray-600">
+                        <Clock className="w-4 h-4" />
+                        <span>{provider.response_time}</span>
+                      </div>
+                      <span className="font-semibold text-gray-900">{provider.price_range}</span>
+                    </div>
+
+                    {/* Speaks English Badge */}
+                    {provider.speaks_english && (
+                      <Badge variant="outline" className="text-xs border-accent-300 text-accent-700 bg-accent-50">
+                        {t('providers.speaks_english')}
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* WhatsApp Button */}
                   <WhatsAppButton
                     providerName={provider.name}
                     phoneNumber={provider.phone}

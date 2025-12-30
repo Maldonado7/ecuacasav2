@@ -22,7 +22,7 @@ export function ServiceGrid({ services }: ServiceGridProps) {
   const { t, locale } = useTranslation();
 
   return (
-    <section className="py-16 sm:py-20 bg-gray-50">
+    <section className="py-16 sm:py-20 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -38,20 +38,21 @@ export function ServiceGrid({ services }: ServiceGridProps) {
             const Icon = SERVICE_ICONS[service.slug] || DEFAULT_SERVICE_ICON;
             return (
               <Link key={service.slug} href={`/services/${service.slug}`}>
-                <Card className="h-full hover:shadow-lg transition-shadow duration-200 cursor-pointer group">
+                <Card className="h-full hover:shadow-2xl transition-all duration-300 cursor-pointer group border-2 border-gray-100 hover:border-accent-200 hover:-translate-y-1">
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary-200 transition-colors">
-                      <Icon className="w-6 h-6 text-primary-600" />
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary-50 to-blue-100 rounded-2xl flex items-center justify-center mb-5 group-hover:from-accent-50 group-hover:to-accent-100 transition-all duration-300 group-hover:scale-110">
+                      <Icon className="w-8 h-8 text-primary-600 group-hover:text-accent-600 transition-colors" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-accent-600 transition-colors">
                       {getLocalizedField(service, 'name', locale)}
                     </h3>
-                    <p className="text-gray-600 mb-4 line-clamp-2">
+                    <p className="text-gray-600 mb-4 line-clamp-2 leading-relaxed">
                       {getLocalizedField(service, 'description', locale)}
                     </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-primary-600 font-medium group-hover:text-primary-700">
-                        {t('services.view_providers')} →
+                    <div className="flex items-center justify-between pt-2">
+                      <span className="text-accent-600 font-semibold group-hover:text-accent-700 flex items-center gap-1">
+                        {t('services.view_providers')}
+                        <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
                       </span>
                     </div>
                   </CardContent>
