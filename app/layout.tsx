@@ -4,6 +4,7 @@ import "./globals.css";
 import { TranslationProvider } from "@/hooks/use-translation";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { FloatingWhatsApp } from "@/components/shared/floating-whatsapp";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,6 +36,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <FloatingWhatsApp />
         </TranslationProvider>
       </body>
     </html>

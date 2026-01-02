@@ -1,12 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
-import { CheckCircle } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { SearchBar } from '@/components/shared/search-bar';
 import { getLocalizedField } from '@/lib/i18n/helpers';
-import { getHeroImage, getBlurDataURL } from '@/lib/utils/placeholders';
 
 interface HeroSectionProps {
   services: Array<{
@@ -14,64 +12,56 @@ interface HeroSectionProps {
     name_es: string;
     name_en: string;
   }>;
-  locations: Array<{
-    slug: string;
-    name: string;
-  }>;
 }
 
-export function HeroSection({ services, locations }: HeroSectionProps) {
+export function HeroSection({ services }: HeroSectionProps) {
   const { t, locale } = useTranslation();
 
   return (
-    <section className="relative bg-gradient-to-b from-white via-blue-50/30 to-white overflow-hidden">
-      {/* Hero Image - Right side on desktop, background on mobile */}
-      <div className="absolute right-0 top-0 bottom-0 w-full lg:w-1/2 opacity-40 lg:opacity-100">
-        <Image
-          src={getHeroImage()}
-          alt="Cuenca, Ecuador"
-          fill
-          className="object-cover"
-          priority
-          placeholder="blur"
-          blurDataURL={getBlurDataURL()}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 lg:via-white/80 to-transparent" />
+    <section className="pt-16 relative overflow-hidden">
+      {/* Gradient Background with Animated Blobs */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-50 to-yellow-50">
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+        <div className="absolute top-0 -right-4 w-96 h-96 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
       {/* Content */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
-        <div className="max-w-2xl">
-          {/* Trust Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent-50 border border-accent-200 rounded-full mb-6 shadow-sm">
-            <CheckCircle className="w-4 h-4 text-accent-600" />
-            <span className="text-sm font-medium text-accent-900">
-              {t('hero.trust_badge')}
-            </span>
+      <div className="relative max-w-7xl mx-auto px-4 py-24 lg:py-32">
+        <div className="text-center max-w-4xl mx-auto">
+          {/* Trending Badge */}
+          <div className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full text-sm font-medium mb-8">
+            <TrendingUp className="w-4 h-4" />
+            {t('hero.badge')}
           </div>
 
-          {/* Heading */}
-          <h1 className="text-5xl sm:text-6xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            {t('hero.title')}
+          {/* Heading with Gradient Text */}
+          <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-6">
+            {t('hero.title')}{' '}
+            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              {t('hero.cuenca')}
+            </span>
           </h1>
 
-          <p className="text-xl text-gray-600 mb-10 leading-relaxed">
+          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
             {t('hero.subtitle')}
           </p>
 
-          {/* Search Bar - Elevated */}
-          <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-2 hover:border-accent-200 transition-colors">
-            <SearchBar services={services} locations={locations} />
+          {/* Search Bar - Glassmorphism Style */}
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-2xl p-4 border border-white/50">
+              <SearchBar services={services} />
+            </div>
           </div>
 
           {/* Popular Services */}
-          <div className="mt-6 flex flex-wrap items-center gap-2">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
             <span className="text-sm text-gray-500">{t('hero.popular')}:</span>
             {services.slice(0, 4).map((service) => (
               <Link
                 key={service.slug}
                 href={`/services/${service.slug}`}
-                className="px-3 py-1.5 bg-gray-100 hover:bg-accent-50 hover:text-accent-700 text-gray-700 text-sm font-medium rounded-full transition-all shadow-sm hover:shadow"
+                className="px-3 py-1.5 bg-white/80 hover:bg-purple-50 hover:text-purple-700 text-gray-700 text-sm font-medium rounded-full transition-all shadow-sm hover:shadow"
               >
                 {getLocalizedField(service, 'name', locale)}
               </Link>

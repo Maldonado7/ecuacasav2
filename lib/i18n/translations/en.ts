@@ -7,7 +7,8 @@ export const en = {
   'nav.admin': 'Admin',
 
   // Homepage - Hero
-  'hero.title': 'Find Trusted Home Services in Cuenca',
+  'hero.title': 'Find Trusted Home Services in',
+  'hero.cuenca': 'Cuenca',
   'hero.subtitle': 'Connect with verified local professionals who speak English',
   'hero.search_placeholder': 'What service do you need?',
   'hero.location_placeholder': 'Select area (optional)',
@@ -15,6 +16,18 @@ export const en = {
   'hero.search_button_short': 'Search',
   'hero.popular': 'Popular',
   'hero.trust_badge': 'Trusted by 1,000+ expats in Cuenca',
+  'hero.badge': '#1 in home services',
+
+  // Stats Bar
+  'stats.users': 'active users',
+  'stats.rating': 'average rating',
+  'stats.verified': 'verified',
+
+  // CTA Section
+  'cta.title': 'Are You a Professional?',
+  'cta.subtitle': 'Join our network of verified providers and connect with customers in Cuenca',
+  'cta.signup': 'Register Now',
+  'cta.learn_more': 'Learn More',
 
   // Services
   'services.title': 'Our Services',

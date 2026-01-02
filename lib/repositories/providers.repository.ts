@@ -14,6 +14,46 @@ function transformProviderData(providers: any[]) {
 
 export const providersRepository = {
   /**
+   * Get all active providers
+   */
+  getAll: cache(async () => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('providers')
+      .select(`
+        id,
+        slug,
+        name,
+        description_es,
+        description_en,
+        rating,
+        review_count,
+        price_range,
+        response_time,
+        verified,
+        speaks_english,
+        featured,
+        phone,
+        services:provider_services(
+          service:services(slug, name_es, name_en)
+        )
+      `)
+      .eq('status', 'active')
+      .order('rating', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching all providers:', error);
+      return [];
+    }
+
+    return (data || []).map(provider => ({
+      ...provider,
+      services: provider.services?.map((ps: any) => ps.service) || [],
+      neighborhoods: [],
+    }));
+  }),
+
+  /**
    * Get featured providers (highlighted on homepage)
    */
   getFeatured: cache(async (limit = 6) => {

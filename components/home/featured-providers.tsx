@@ -53,23 +53,19 @@ export function FeaturedProviders({ providers }: FeaturedProvidersProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {providers.map((provider) => (
-            <Card key={provider.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-accent-200">
+          {providers.map((provider, i) => (
+            <Card key={provider.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-purple-300">
               <CardContent className="p-0">
-                {/* Provider Photo */}
+                {/* Provider Header with Avatar */}
                 <Link href={`/providers/${provider.slug}`}>
-                  <div className="relative h-48 w-full bg-gradient-to-br from-primary-50 to-blue-100 overflow-hidden">
-                    <Image
-                      src={getProviderPlaceholder(provider.name)}
-                      alt={provider.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      placeholder="blur"
-                      blurDataURL={getBlurDataURL()}
-                    />
+                  <div className="relative h-48 w-full bg-gradient-to-br from-purple-50 to-pink-50 overflow-hidden flex items-center justify-center">
+                    {/* Gradient Avatar */}
+                    <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-xl group-hover:scale-110 transition-transform">
+                      {provider.name?.charAt(0) || 'P'}
+                    </div>
                     {/* Verified Badge Overlay */}
                     {provider.verified && (
-                      <div className="absolute top-3 right-3 bg-success text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-medium shadow-lg">
+                      <div className="absolute top-3 right-3 bg-green-500 text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-medium shadow-lg">
                         <CheckCircle className="w-3.5 h-3.5" />
                         {t('providers.verified')}
                       </div>
@@ -136,7 +132,7 @@ export function FeaturedProviders({ providers }: FeaturedProvidersProps) {
         <div className="text-center mt-10">
           <Link
             href="/providers"
-            className="inline-block px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
+            className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl hover:shadow-xl transition-all hover:scale-105"
           >
             {t('providers.view_all')}
           </Link>

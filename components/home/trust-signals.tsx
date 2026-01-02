@@ -1,9 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import { useTranslation } from '@/hooks/use-translation';
 import { Shield, Users, Star, MessageCircle, Quote } from 'lucide-react';
-import { getTestimonialAvatar, getBlurDataURL } from '@/lib/utils/placeholders';
 
 export function TrustSignals() {
   const { t } = useTranslation();
@@ -141,15 +139,8 @@ export function TrustSignals() {
 
                 {/* Author */}
                 <div className="flex items-center gap-4">
-                  <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-primary-50 to-blue-100">
-                    <Image
-                      src={getTestimonialAvatar(testimonial.name)}
-                      alt={testimonial.name}
-                      fill
-                      className="object-cover"
-                      placeholder="blur"
-                      blurDataURL={getBlurDataURL()}
-                    />
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                    {testimonial.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                   </div>
                   <div>
                     <div className="font-semibold text-gray-900">{testimonial.name}</div>

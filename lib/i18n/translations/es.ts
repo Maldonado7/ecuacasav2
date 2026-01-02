@@ -7,7 +7,8 @@ export const es = {
   'nav.admin': 'Administración',
 
   // Homepage - Hero
-  'hero.title': 'Encuentra Servicios para el Hogar en Cuenca',
+  'hero.title': 'Encuentra Servicios para el Hogar en',
+  'hero.cuenca': 'Cuenca',
   'hero.subtitle': 'Conecta con profesionales locales verificados',
   'hero.search_placeholder': '¿Qué servicio necesitas?',
   'hero.location_placeholder': 'Selecciona zona (opcional)',
@@ -15,6 +16,18 @@ export const es = {
   'hero.search_button_short': 'Buscar',
   'hero.popular': 'Popular',
   'hero.trust_badge': 'Confiado por más de 1,000 expatriados en Cuenca',
+  'hero.badge': '#1 en servicios para el hogar',
+
+  // Stats Bar
+  'stats.users': 'usuarios activos',
+  'stats.rating': 'calificación promedio',
+  'stats.verified': 'verificados',
+
+  // CTA Section
+  'cta.title': '¿Eres Profesional?',
+  'cta.subtitle': 'Únete a nuestra red de proveedores verificados y conecta con clientes en Cuenca',
+  'cta.signup': 'Regístrate Ahora',
+  'cta.learn_more': 'Más Información',
 
   // Services
   'services.title': 'Nuestros Servicios',
