@@ -7,6 +7,9 @@ import { TrustSignals } from '@/components/home/trust-signals';
 import { CTASection } from '@/components/home/cta-section';
 import { servicesRepository, providersRepository } from '@/lib/repositories';
 
+// Force dynamic rendering to avoid build-time database calls
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   // Parallel data fetching with repositories
   const [services, featuredProviders] = await Promise.all([

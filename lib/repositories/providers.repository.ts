@@ -1,15 +1,22 @@
 import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 
-/**
- * Transform Supabase provider response to clean domain model
- */
-function transformProviderData(providers: any[]) {
-  return providers.map(provider => ({
-    ...provider,
-    services: provider.services?.map((ps: any) => ps.service) || [],
-    neighborhoods: provider.neighborhoods?.map((pn: any) => pn.neighborhood) || [],
-  }));
+interface ProviderData {
+  id: string;
+  slug: string;
+  name: string;
+  description_es?: string;
+  description_en?: string;
+  rating: number;
+  review_count: number;
+  price_range?: string;
+  response_time?: string;
+  verified: boolean;
+  speaks_english: boolean;
+  featured?: boolean;
+  phone: string;
+  services?: any[];
+  neighborhoods?: any[];
 }
 
 export const providersRepository = {
@@ -46,7 +53,7 @@ export const providersRepository = {
       return [];
     }
 
-    return (data || []).map(provider => ({
+    return (data || []).map((provider: any) => ({
       ...provider,
       services: provider.services?.map((ps: any) => ps.service) || [],
       neighborhoods: [],
@@ -87,7 +94,7 @@ export const providersRepository = {
     }
 
     // Transform data without neighborhoods for now
-    return (data || []).map(provider => ({
+    return (data || []).map((provider: any) => ({
       ...provider,
       services: provider.services?.map((ps: any) => ps.service) || [],
       neighborhoods: [], // Empty for now until DB schema is fixed
@@ -126,7 +133,7 @@ export const providersRepository = {
       return [];
     }
 
-    return (data || []).map(provider => ({
+    return (data || []).map((provider: any) => ({
       ...provider,
       services: provider.services?.map((ps: any) => ps.service) || [],
       neighborhoods: [],
@@ -154,9 +161,10 @@ export const providersRepository = {
       return null;
     }
 
+    const providerData = data as any;
     return {
-      ...data,
-      services: data.services?.map((ps: any) => ps.service) || [],
+      ...providerData,
+      services: providerData.services?.map((ps: any) => ps.service) || [],
       neighborhoods: [],
     };
   }),

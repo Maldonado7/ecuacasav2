@@ -3,6 +3,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { servicesRepository } from '@/lib/repositories';
 import { SERVICE_ICONS, DEFAULT_SERVICE_ICON } from '@/lib/constants';
 
+// Force dynamic rendering to avoid build-time database calls
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Servicios | EcuaCasa',
   description: 'Explora todos los servicios para el hogar disponibles en Cuenca, Ecuador',

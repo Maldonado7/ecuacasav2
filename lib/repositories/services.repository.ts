@@ -1,11 +1,19 @@
 import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 
+interface Service {
+  slug: string;
+  name_es: string;
+  name_en: string;
+  description_es: string;
+  description_en: string;
+}
+
 export const servicesRepository = {
   /**
    * Get all active services
    */
-  getActive: cache(async () => {
+  getActive: cache(async (): Promise<Service[]> => {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from('services')
@@ -17,15 +25,15 @@ export const servicesRepository = {
       return [];
     }
 
-    return data || [];
+    return (data as Service[]) || [];
   }),
 
   /**
    * Get service by slug
    */
-  getBySlug: cache(async (slug: string) => {
+  getBySlug: cache(async (slug: string): Promise<Service | null> => {
     const supabase = await createClient();
-    const { data, error} = await supabase
+    const { data, error } = await supabase
       .from('services')
       .select('*')
       .eq('slug', slug)
@@ -36,6 +44,6 @@ export const servicesRepository = {
       return null;
     }
 
-    return data;
+    return data as Service;
   }),
 };
