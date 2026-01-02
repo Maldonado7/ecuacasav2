@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { MessageCircle, X } from 'lucide-react';
 
-const SUPPORT_PHONE = '593991234567'; // Replace with your actual support number
+const SUPPORT_PHONE = '593939451457';
 
 export function FloatingWhatsApp() {
   const [isOpen, setIsOpen] = useState(false);

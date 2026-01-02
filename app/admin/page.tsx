@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
-import { createClient } from '@/lib/supabase/client';
 import { Users, FileText, Star, TrendingUp } from 'lucide-react';
 
 interface Stats {
@@ -24,38 +23,20 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     async function fetchStats() {
-      const supabase = createClient();
-
-      // Fetch provider stats
-      const { count: totalProviders } = await supabase
-        .from('providers')
-        .select('*', { count: 'exact', head: true });
-
-      const { count: activeProviders } = await supabase
-        .from('providers')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
-
-      const { count: pendingRegistrations } = await supabase
-        .from('registration_requests')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
-
-      const { data: ratingData } = await supabase
-        .from('providers')
-        .select('rating')
-        .eq('status', 'active');
-
-      const avgRating = ratingData?.length
-        ? ratingData.reduce((acc, p) => acc + p.rating, 0) / ratingData.length
-        : 0;
-
-      setStats({
-        totalProviders: totalProviders || 0,
-        activeProviders: activeProviders || 0,
-        pendingRegistrations: pendingRegistrations || 0,
-        averageRating: Math.round(avgRating * 10) / 10,
-      });
+      try {
+        const response = await fetch('/api/admin/stats');
+        if (response.ok) {
+          const data = await response.json();
+          setStats({
+            totalProviders: data.totalProviders || 0,
+            activeProviders: data.activeProviders || 0,
+            pendingRegistrations: data.pendingRegistrations || 0,
+            averageRating: data.averageRating || 0,
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
       setLoading(false);
     }
 
