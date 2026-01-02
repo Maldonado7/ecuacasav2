@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function getSupabaseClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 export async function GET() {
+  const supabase = getSupabaseClient();
   try {
     const { data, error } = await supabase
       .from('registration_requests')
@@ -26,6 +29,7 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  const supabase = getSupabaseClient();
   try {
     const { id, status } = await request.json();
 
