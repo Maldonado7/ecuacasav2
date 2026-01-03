@@ -1,6 +1,10 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+
+// Disable caching - always fetch fresh data
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { RatingStars } from '@/components/shared/rating-stars';
