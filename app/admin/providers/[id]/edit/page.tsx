@@ -265,14 +265,14 @@ export default function EditProviderPage() {
 
               {/* Price Range */}
               <div>
-                <Label htmlFor="price_range">Rango de precios</Label>
-                <Input id="price_range" {...register('price_range')} className="mt-1" placeholder="$25-50/hora" />
+                <Label htmlFor="price_range">Rango de precios (opcional)</Label>
+                <Input id="price_range" {...register('price_range')} className="mt-1" placeholder="Ej: $25-50/hora - Dejar vacío si no aplica" />
               </div>
 
               {/* Response Time */}
               <div>
-                <Label htmlFor="response_time">Tiempo de respuesta</Label>
-                <Input id="response_time" {...register('response_time')} className="mt-1" placeholder="30 min" />
+                <Label htmlFor="response_time">Tiempo de respuesta (opcional)</Label>
+                <Input id="response_time" {...register('response_time')} className="mt-1" placeholder="Ej: 30 min - Dejar vacío si no aplica" />
               </div>
 
               {/* Rating */}
