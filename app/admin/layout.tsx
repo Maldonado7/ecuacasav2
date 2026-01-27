@@ -2,10 +2,9 @@
 
 import { useState, useEffect, ReactNode } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Users, FileText, LogOut, Menu, X } from 'lucide-react';
-
-const ADMIN_PASSWORD = 'ecuacasa2025'; // In production, use proper auth
+import { createClient } from '@/lib/supabase/client';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -13,34 +12,75 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [loginLoading, setLoginLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
-    const auth = sessionStorage.getItem('admin_auth');
-    if (auth === 'true') {
-      setIsAuthenticated(true);
-    }
-    setLoading(false);
+    checkAuth();
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  async function checkAuth() {
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user?.email) {
+        // Verify admin status via API (checks admin_users table server-side)
+        const res = await fetch('/api/admin/auth/check');
+        if (res.ok) {
+          setIsAuthenticated(true);
+        }
+      }
+    } catch {
+      // Not authenticated
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem('admin_auth', 'true');
+    setLoginLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Error al iniciar sesión');
+        return;
+      }
+
       setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('Contraseña incorrecta');
+    } catch {
+      setError('Error de conexión');
+    } finally {
+      setLoginLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('admin_auth');
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/auth', { method: 'DELETE' });
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch {
+      // Ignore
+    }
     setIsAuthenticated(false);
+    router.refresh();
   };
 
   const navItems = [
@@ -67,6 +107,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <form onSubmit={handleLogin}>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="admin@ecuacasa.com"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Contraseña
               </label>
               <input
@@ -75,6 +128,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="Ingresa la contraseña"
+                required
               />
             </div>
             {error && (
@@ -82,9 +136,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             )}
             <button
               type="submit"
-              className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
+              disabled={loginLoading}
+              className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
             >
-              Ingresar
+              {loginLoading ? 'Ingresando...' : 'Ingresar'}
             </button>
           </form>
         </div>

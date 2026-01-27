@@ -147,3 +147,16 @@ CREATE INDEX idx_provider_locations_location ON provider_locations(location_id);
 CREATE INDEX idx_reviews_provider ON reviews(provider_id);
 
 CREATE INDEX idx_registration_status ON registration_requests(status, created_at);
+
+-- CONTACT LOGS
+CREATE TABLE contact_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider_id UUID REFERENCES providers(id) ON DELETE CASCADE,
+  service_type TEXT,
+  referrer TEXT,
+  contacted_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_contact_logs_provider ON contact_logs(provider_id);
+CREATE INDEX idx_contact_logs_contacted_at ON contact_logs(contacted_at);

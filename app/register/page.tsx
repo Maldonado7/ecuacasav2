@@ -79,8 +79,18 @@ export default function RegisterPage() {
     setSubmitting(true);
 
     try {
-      // Prepend +593 to phone number
-      const fullPhone = `+593${data.phone.replace(/\s/g, '')}`;
+      // Normalize phone number: strip spaces, leading 0, and ensure +593 prefix
+      let fullPhone = data.phone.replace(/\s/g, '');
+      if (fullPhone.startsWith('+593')) {
+        // Already has prefix
+      } else if (fullPhone.startsWith('593')) {
+        fullPhone = `+${fullPhone}`;
+      } else {
+        if (fullPhone.startsWith('0')) {
+          fullPhone = fullPhone.substring(1);
+        }
+        fullPhone = `+593${fullPhone}`;
+      }
 
       const response = await fetch('/api/register', {
         method: 'POST',

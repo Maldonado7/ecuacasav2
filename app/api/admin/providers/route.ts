@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from '@/lib/supabase/require-admin';
 
 function getSupabaseClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
 export async function POST(request: NextRequest) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const supabase = getSupabaseClient();
   try {
     const data = await request.json();
@@ -21,9 +25,16 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
 
-    // Prepend +593 to phone number if not already present
+    // Normalize phone number
     let fullPhone = data.phone.replace(/\s/g, '');
-    if (!fullPhone.startsWith('+')) {
+    if (fullPhone.startsWith('+593')) {
+      // Already correct
+    } else if (fullPhone.startsWith('593')) {
+      fullPhone = `+${fullPhone}`;
+    } else {
+      if (fullPhone.startsWith('0')) {
+        fullPhone = fullPhone.substring(1);
+      }
       fullPhone = `+593${fullPhone}`;
     }
 
@@ -93,6 +104,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const supabase = getSupabaseClient();
   try {
     const data = await request.json();
@@ -102,10 +116,19 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Provider ID is required' }, { status: 400 });
     }
 
-    // Prepend +593 to phone number if not already present
+    // Normalize phone number
     let fullPhone = updateData.phone?.replace(/\s/g, '') || '';
-    if (fullPhone && !fullPhone.startsWith('+')) {
-      fullPhone = `+593${fullPhone}`;
+    if (fullPhone) {
+      if (fullPhone.startsWith('+593')) {
+        // Already correct
+      } else if (fullPhone.startsWith('593')) {
+        fullPhone = `+${fullPhone}`;
+      } else {
+        if (fullPhone.startsWith('0')) {
+          fullPhone = fullPhone.substring(1);
+        }
+        fullPhone = `+593${fullPhone}`;
+      }
     }
 
     // Update provider

@@ -133,6 +133,19 @@ CREATE TABLE admin_users (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 8. CONTACT LOGS
+CREATE TABLE contact_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider_id UUID REFERENCES providers(id) ON DELETE CASCADE,
+  service_type TEXT,
+  referrer TEXT,
+  contacted_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_contact_logs_provider ON contact_logs(provider_id);
+CREATE INDEX idx_contact_logs_contacted_at ON contact_logs(contacted_at);
+
 -- ============================================
 -- STEP 4: CREATE INDEXES
 -- ============================================
