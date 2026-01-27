@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ProviderJsonLd } from '@/components/seo/json-ld';
 
-// Disable caching - always fetch fresh data
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
+// ISR: revalidate every hour
+export const revalidate = 3600;
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { RatingStars } from '@/components/shared/rating-stars';
@@ -41,6 +41,14 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      <ProviderJsonLd
+        name={provider.name}
+        description={provider.description_es || provider.description_en || ''}
+        slug={slug}
+        rating={provider.rating}
+        reviewCount={provider.review_count}
+        services={provider.services?.map((s: any) => s.name_en || s.name_es) || []}
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         {/* Back Link */}
         <Link

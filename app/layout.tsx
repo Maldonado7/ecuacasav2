@@ -9,16 +9,41 @@ import { FloatingWhatsApp } from "@/components/shared/floating-whatsapp";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "EcuaCasa - Home Services in Cuenca, Ecuador",
-  description: "Find trusted home service providers in Cuenca, Ecuador. Connect with verified local professionals who speak English.",
-  keywords: "Cuenca, Ecuador, home services, plumber, electrician, cleaning, handyman, expat services",
+  title: {
+    default: "EcuaCasa - Trusted Home Services in Cuenca, Ecuador",
+    template: "%s | EcuaCasa",
+  },
+  description: "Find trusted, verified home service professionals in Cuenca, Ecuador. Plumbers, electricians, cleaners & more — English-speaking providers for expats and locals.",
+  keywords: "Cuenca, Ecuador, home services, plumber, electrician, cleaning, handyman, expat services, servicios del hogar, profesionales verificados",
+  metadataBase: new URL("https://ecuacasa.com"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "EcuaCasa - Home Services in Cuenca, Ecuador",
-    description: "Find trusted home service providers in Cuenca, Ecuador. Connect with verified local professionals who speak English.",
+    title: "EcuaCasa - Trusted Home Services in Cuenca, Ecuador",
+    description: "Find trusted, verified home service professionals in Cuenca, Ecuador. English-speaking providers for expats and locals.",
     url: "https://ecuacasa.com",
     siteName: "EcuaCasa",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "EcuaCasa - Home Services in Cuenca, Ecuador",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EcuaCasa - Trusted Home Services in Cuenca, Ecuador",
+    description: "Find trusted, verified home service professionals in Cuenca, Ecuador. English-speaking providers for expats and locals.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

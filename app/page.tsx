@@ -1,3 +1,4 @@
+import { OrganizationJsonLd } from '@/components/seo/json-ld';
 import { HeroSection } from '@/components/home/hero-section';
 import { StatsBar } from '@/components/home/stats-bar';
 import { ServiceGrid } from '@/components/home/service-grid';
@@ -7,9 +8,8 @@ import { TrustSignals } from '@/components/home/trust-signals';
 import { CTASection } from '@/components/home/cta-section';
 import { servicesRepository, providersRepository } from '@/lib/repositories';
 
-// Force dynamic rendering to avoid build-time database calls
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// ISR: revalidate every hour
+export const revalidate = 3600;
 
 export default async function HomePage() {
   // Parallel data fetching with repositories
@@ -20,6 +20,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <OrganizationJsonLd />
       <HeroSection services={services.slice(0, 10)} />
       <StatsBar />
       <ServiceGrid services={services.slice(0, 6)} />

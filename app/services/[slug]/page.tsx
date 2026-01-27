@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ServiceJsonLd } from '@/components/seo/json-ld';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { RatingStars } from '@/components/shared/rating-stars';
@@ -43,6 +44,11 @@ export default async function ServicePage({ params }: ServicePageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      <ServiceJsonLd
+        name={service.name_es}
+        description={service.description_es}
+        slug={service.slug}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         {/* Back Link */}
         <Link
