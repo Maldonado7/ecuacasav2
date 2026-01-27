@@ -3,7 +3,7 @@ import { CheckCircle, Users, MessageCircle, Star, TrendingUp, Shield, Clock } fr
 
 export const metadata = {
   title: 'Para Profesionales | EcuaCasa',
-  description: 'Únete a EcuaCasa y conecta con miles de clientes que buscan tus servicios en Cuenca',
+  description: 'Únete a EcuaCasa y conecta con clientes expatriados que buscan tus servicios en Cuenca — 100% gratis',
 };
 
 export default function ForProvidersPage() {
@@ -157,25 +157,30 @@ export default function ForProvidersPage() {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Why It's Free Section */}
       <section className="py-16 bg-primary-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl sm:text-5xl font-bold mb-2">50+</div>
-              <div className="text-primary-200">Profesionales activos</div>
-            </div>
-            <div>
-              <div className="text-4xl sm:text-5xl font-bold mb-2">1,000+</div>
-              <div className="text-primary-200">Clientes potenciales</div>
-            </div>
-            <div>
-              <div className="text-4xl sm:text-5xl font-bold mb-2">12</div>
-              <div className="text-primary-200">Categorías de servicios</div>
-            </div>
-            <div>
-              <div className="text-4xl sm:text-5xl font-bold mb-2">0%</div>
-              <div className="text-primary-200">Comisiones</div>
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+              100% Gratis — Sin Letra Pequeña
+            </h2>
+            <p className="text-xl text-primary-100 mb-10">
+              Estamos construyendo la mejor red de profesionales en Cuenca. 
+              Por eso el registro es completamente gratis — sin comisiones, sin cuotas, sin sorpresas.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+              <div>
+                <div className="text-4xl sm:text-5xl font-bold mb-2">$0</div>
+                <div className="text-primary-200">Para registrarte</div>
+              </div>
+              <div>
+                <div className="text-4xl sm:text-5xl font-bold mb-2">0%</div>
+                <div className="text-primary-200">Comisiones</div>
+              </div>
+              <div>
+                <div className="text-4xl sm:text-5xl font-bold mb-2">100%</div>
+                <div className="text-primary-200">Contacto directo</div>
+              </div>
             </div>
           </div>
         </div>
