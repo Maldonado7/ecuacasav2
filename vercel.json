@@ -11,6 +11,46 @@
       "source": "/servicios",
       "destination": "/services",
       "permanent": true
+    },
+    {
+      "source": "/plomeria",
+      "destination": "/services/plomeria",
+      "permanent": true
+    },
+    {
+      "source": "/limpieza",
+      "destination": "/services/limpieza",
+      "permanent": true
+    },
+    {
+      "source": "/electricidad",
+      "destination": "/services/electricidad",
+      "permanent": true
+    },
+    {
+      "source": "/handyman",
+      "destination": "/services/handyman",
+      "permanent": true
+    },
+    {
+      "source": "/jardineria",
+      "destination": "/services/jardineria",
+      "permanent": true
+    },
+    {
+      "source": "/pintura",
+      "destination": "/services/pintura",
+      "permanent": true
+    },
+    {
+      "source": "/mudanzas",
+      "destination": "/services/mudanzas",
+      "permanent": true
+    },
+    {
+      "source": "/cerrajeria",
+      "destination": "/services/cerrajeria",
+      "permanent": true
     }
   ]
 }
