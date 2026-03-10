@@ -179,11 +179,11 @@ CREATE OR REPLACE FUNCTION is_admin()
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
-    SELECT 1 FROM admin_users
+    SELECT 1 FROM public.admin_users
     WHERE email = auth.jwt() ->> 'email'
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- ============================================
 -- STEP 7: CREATE RLS POLICIES

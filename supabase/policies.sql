@@ -74,15 +74,16 @@ CREATE POLICY "public_create_registration"
 -- ============================================
 
 -- Helper function to check if user is admin
+-- SET search_path = public prevents privilege escalation via schema search path manipulation
 CREATE OR REPLACE FUNCTION is_admin()
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
-    SELECT 1 FROM admin_users
+    SELECT 1 FROM public.admin_users
     WHERE email = auth.jwt() ->> 'email'
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Admins can do everything on providers
 CREATE POLICY "admin_all_providers"
