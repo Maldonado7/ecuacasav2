@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     .from('reviews')
     .select('id, customer_name, rating, comment, created_at')
     .eq('provider_id', providerId)
+    .eq('status', 'published')
     .order('created_at', { ascending: false })
     .limit(50);
 

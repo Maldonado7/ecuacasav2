@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         description_en: data.description_en || null,
         price_range: data.price_range || null,
         response_time: data.response_time || null,
-        rating: data.rating || 5,
+        rating: data.rating || 0,
         review_count: data.review_count || 0,
         speaks_english: data.speaks_english || false,
         verified: data.verified || false,

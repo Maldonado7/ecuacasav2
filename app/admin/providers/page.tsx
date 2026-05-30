@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
-import { Plus, Edit, Trash2, CheckCircle, Star, ImageIcon, X, Check, Lock, Loader2, Users, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, Star, ImageIcon, X, Check, Lock, Loader2, Users, Search, MessageSquarePlus } from 'lucide-react';
 
 interface Provider {
   id: string;
   name: string;
+  slug: string;
   phone: string;
   photo_url: string | null;
   rating: number;
@@ -255,7 +256,7 @@ export default function AdminProvidersPage() {
     const supabase = createClient();
     const { data } = await supabase
       .from('providers')
-      .select('id, name, phone, photo_url, rating, verified, featured, status, speaks_english, created_at')
+      .select('id, name, slug, phone, photo_url, rating, verified, featured, status, speaks_english, created_at')
       .order('created_at', { ascending: false });
 
     setProviders(data || []);
@@ -309,6 +310,17 @@ export default function AdminProvidersPage() {
       }
     }
     fetchProviders();
+  }
+
+  // Copy the per-provider review link the operator sends customers after a job.
+  async function copyReviewLink(slug: string) {
+    const url = `${window.location.origin}/providers/${slug}/review`;
+    try {
+      await navigator.clipboard.writeText(url);
+      alert('Link de reseña copiado:\n' + url);
+    } catch {
+      window.prompt('Copia el link de reseña:', url);
+    }
   }
 
   async function deleteProvider(id: string, name: string) {
@@ -458,6 +470,13 @@ export default function AdminProvidersPage() {
                       >
                         <ImageIcon className="w-4 h-4" />
                       </button>
+                      <button
+                        onClick={() => copyReviewLink(provider.slug)}
+                        className="p-2 rounded-xl text-green-600 bg-green-50 hover:bg-green-100 transition-colors"
+                        title="Copiar link de reseña"
+                      >
+                        <MessageSquarePlus className="w-4 h-4" />
+                      </button>
                       <Link href={`/admin/providers/${provider.id}/edit`}>
                         <button className="p-2 rounded-xl text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
                           <Edit className="w-4 h-4" />
@@ -571,6 +590,13 @@ export default function AdminProvidersPage() {
                           title="Foto de tarjeta"
                         >
                           <ImageIcon className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => copyReviewLink(provider.slug)}
+                          className="p-2 rounded-xl text-green-600 bg-green-50 hover:bg-green-100 transition-colors"
+                          title="Copiar link de reseña"
+                        >
+                          <MessageSquarePlus className="w-4 h-4" />
                         </button>
                         <Link href={`/admin/providers/${provider.id}/edit`}>
                           <button className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors">
