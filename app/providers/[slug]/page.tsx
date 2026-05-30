@@ -70,7 +70,10 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               {/* Badges */}
               <div className="absolute top-4 right-4 flex gap-2">
                 {provider.verified && (
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 text-sm font-medium">
+                  <div
+                    title="Identidad (cédula o RUC) verificada y referencias o negocio confirmados por nuestro equipo."
+                    className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 text-sm font-medium cursor-help"
+                  >
                     <CheckCircle className="w-4 h-4" />
                     Verificado
                   </div>
@@ -110,8 +113,16 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     {provider.name}
                   </h1>
                   <div className="flex flex-wrap items-center gap-4">
-                    <RatingStars rating={provider.rating} size="md" showValue className="text-white" />
-                    <span className="text-white/80">({provider.review_count} reseñas)</span>
+                    {provider.review_count > 0 ? (
+                      <>
+                        <RatingStars rating={provider.rating} size="md" showValue className="text-white" />
+                        <span className="text-white/80">({provider.review_count} reseñas)</span>
+                      </>
+                    ) : (
+                      <span className="inline-flex items-center rounded-full bg-white/20 px-3 py-1 text-sm font-medium text-white">
+                        Nuevo
+                      </span>
+                    )}
                   </div>
                   {provider.speaks_english && (
                     <Badge className="mt-3 bg-white/20 text-white border-0">

@@ -94,6 +94,8 @@ export const es = {
   'providers.all': 'Todos los Profesionales',
   'providers.speaks_english': 'Habla Inglés',
   'providers.verified': 'Verificado',
+  'providers.verified_tooltip': 'Identidad (cédula o RUC) verificada y referencias o negocio confirmados por nuestro equipo.',
+  'providers.new': 'Nuevo',
   'providers.featured': 'Destacado',
   'providers.contact': 'Contactar por WhatsApp',
   'providers.no_results': 'No se encontraron profesionales',

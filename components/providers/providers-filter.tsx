@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { RatingStars } from '@/components/shared/rating-stars';
+import { ProviderRating } from '@/components/shared/provider-rating';
 import { WhatsAppButton } from '@/components/shared/whatsapp-button';
 import { useTranslation } from '@/hooks/use-translation';
 import { getLocalizedField } from '@/lib/i18n/helpers';
@@ -45,7 +45,7 @@ interface ProvidersFilterProps {
 }
 
 export function ProvidersFilter({ providers, services, initialService = '' }: ProvidersFilterProps) {
-  const { locale } = useTranslation();
+  const { locale, t } = useTranslation();
   const [filters, setFilters] = useState({
     service: initialService,
     speaksEnglish: false,
@@ -142,7 +142,10 @@ export function ProvidersFilter({ providers, services, initialService = '' }: Pr
                     )}
                     <div className="absolute top-3 right-3 flex flex-col gap-2">
                       {provider.verified && (
-                        <div className="bg-success text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-medium shadow-lg">
+                        <div
+                          title={t('providers.verified_tooltip')}
+                          className="bg-success text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-medium shadow-lg cursor-help"
+                        >
                           <CheckCircle className="w-3.5 h-3.5" />
                           Verificado
                         </div>
@@ -171,10 +174,11 @@ export function ProvidersFilter({ providers, services, initialService = '' }: Pr
                   )}
 
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2">
-                      <RatingStars rating={provider.rating} size="sm" showValue />
-                      <span className="text-sm text-gray-500">({provider.review_count})</span>
-                    </div>
+                    <ProviderRating
+                      rating={provider.rating}
+                      reviewCount={provider.review_count}
+                      newLabel={t('providers.new')}
+                    />
 
                     <div className="flex items-center justify-between text-sm">
                       {provider.response_time && (

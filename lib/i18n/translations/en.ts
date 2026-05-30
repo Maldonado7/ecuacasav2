@@ -94,6 +94,8 @@ export const en = {
   'providers.all': 'All Providers',
   'providers.speaks_english': 'Speaks English',
   'providers.verified': 'Verified',
+  'providers.verified_tooltip': 'Identity (national ID or RUC) checked and references or business confirmed by our team.',
+  'providers.new': 'New',
   'providers.featured': 'Featured',
   'providers.contact': 'Contact on WhatsApp',
   'providers.no_results': 'No providers found',
