@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendRegistrationNotification } from '@/lib/resend';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { isValidEcuadorCedula, isValidEcuadorRuc } from '@/lib/validations';
 
 function getSupabaseClient() {
   return createClient(
@@ -67,13 +68,18 @@ export async function POST(request: NextRequest) {
     let areas_served: string[];
     let speaks_english: boolean;
     let message: string | null;
+    let kind: 'individual' | 'company' = 'individual';
     let cedula_number: string | null = null;
+    let company_name: string | null = null;
+    let ruc: string | null = null;
+    let business_hours: string | null = null;
     let reference1_name: string | null = null;
     let reference1_phone: string | null = null;
     let reference2_name: string | null = null;
     let reference2_phone: string | null = null;
     let cedulaPhotoFile: File | null = null;
     let profilePhotoFile: File | null = null;
+    let logoFile: File | null = null;
 
     if (isFormData) {
       const formData = await request.formData();
@@ -85,7 +91,12 @@ export async function POST(request: NextRequest) {
       areas_served = safeJsonParse(formData.get('areas_served') as string);
       speaks_english = formData.get('speaks_english') === 'true';
       message = (formData.get('message') as string) || null;
+      kind = (formData.get('kind') as string) === 'company' ? 'company' : 'individual';
       cedula_number = (formData.get('cedula_number') as string) || null;
+      company_name = (formData.get('company_name') as string) || null;
+      ruc = (formData.get('ruc') as string) || null;
+      business_hours = (formData.get('business_hours') as string) || null;
+      logoFile = formData.get('logo') as File | null;
       reference1_name = (formData.get('reference1_name') as string) || null;
       reference1_phone = (formData.get('reference1_phone') as string) || null;
       reference2_name = (formData.get('reference2_name') as string) || null;
@@ -106,6 +117,12 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: fileError }, { status: 400 });
         }
       }
+      if (logoFile && logoFile.size > 0) {
+        const fileError = validateFile(logoFile);
+        if (fileError) {
+          return NextResponse.json({ error: fileError }, { status: 400 });
+        }
+      }
     } else {
       // JSON fallback (for /for-providers or legacy clients)
       const data = await request.json();
@@ -116,6 +133,23 @@ export async function POST(request: NextRequest) {
       areas_served = data.areas_served || [];
       speaks_english = data.speaks_english || false;
       message = data.message || null;
+      kind = data.kind === 'company' ? 'company' : 'individual';
+      cedula_number = data.cedula_number || null;
+      company_name = data.company_name || null;
+      ruc = data.ruc || null;
+      business_hours = data.business_hours || null;
+    }
+
+    // Identity validation by provider type (reject malformed IDs at submit)
+    if (kind === 'company') {
+      if (!company_name || company_name.trim().length < 2) {
+        return NextResponse.json({ error: 'Falta el nombre de la empresa' }, { status: 400 });
+      }
+      if (!ruc || !isValidEcuadorRuc(ruc)) {
+        return NextResponse.json({ error: 'RUC inválido' }, { status: 400 });
+      }
+    } else if (cedula_number && !isValidEcuadorCedula(cedula_number)) {
+      return NextResponse.json({ error: 'Número de cédula inválido' }, { status: 400 });
     }
 
     // Validate required fields
@@ -167,7 +201,11 @@ export async function POST(request: NextRequest) {
         areas_served: areas_served.length > 0 ? areas_served : null,
         speaks_english,
         message,
+        kind,
         cedula_number,
+        company_name,
+        ruc,
+        business_hours,
         reference1_name,
         reference1_phone,
         reference2_name,
@@ -188,6 +226,7 @@ export async function POST(request: NextRequest) {
     const recordId = insertedRow.id;
     let cedula_photo_url: string | null = null;
     let profile_photo_url: string | null = null;
+    let logo_url: string | null = null;
 
     // Upload files to Supabase Storage (private bucket — paths stored, not public URLs)
     if (cedulaPhotoFile && cedulaPhotoFile.size > 0) {
@@ -228,11 +267,31 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (logoFile && logoFile.size > 0) {
+      const ext = getFileExtension(logoFile.name);
+      const storagePath = `${recordId}/logo.${ext}`;
+      const buffer = Buffer.from(await logoFile.arrayBuffer());
+
+      const { error: uploadError } = await supabase.storage
+        .from('registration-uploads')
+        .upload(storagePath, buffer, {
+          contentType: logoFile.type,
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error('Logo upload error:', uploadError);
+      } else {
+        logo_url = storagePath;
+      }
+    }
+
     // Update record with photo URLs if uploaded
-    if (cedula_photo_url || profile_photo_url) {
+    if (cedula_photo_url || profile_photo_url || logo_url) {
       const updateData: Record<string, string> = {};
       if (cedula_photo_url) updateData.cedula_photo_url = cedula_photo_url;
       if (profile_photo_url) updateData.profile_photo_url = profile_photo_url;
+      if (logo_url) updateData.logo_url = logo_url;
 
       const { error: updateError } = await supabase
         .from('registration_requests')
