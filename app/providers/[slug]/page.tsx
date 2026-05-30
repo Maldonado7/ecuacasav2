@@ -78,6 +78,15 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     Verificado
                   </div>
                 )}
+                {provider.background_verified && (
+                  <div
+                    title="Récord policial (antecedentes penales) verificado por nuestro equipo."
+                    className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 text-sm font-medium cursor-help"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Antecedentes
+                  </div>
+                )}
                 {provider.featured && (
                   <div className="bg-accent-500 px-3 py-1.5 rounded-full text-sm font-medium">
                     Destacado

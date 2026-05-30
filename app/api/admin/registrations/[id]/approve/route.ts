@@ -63,6 +63,9 @@ export async function POST(
           ruc: reg.ruc || null,
           business_hours: reg.business_hours || null,
           logo_url: reg.logo_url || null,
+          background_cert_url: reg.background_cert_url || null,
+          background_cert_code: reg.background_cert_code || null,
+          background_cert_date: reg.background_cert_date || null,
           status: 'active',
         })
         .eq('id', existingProvider.id);
@@ -99,6 +102,9 @@ export async function POST(
           ruc: reg.ruc || null,
           business_hours: reg.business_hours || null,
           logo_url: reg.logo_url || null,
+          background_cert_url: reg.background_cert_url || null,
+          background_cert_code: reg.background_cert_code || null,
+          background_cert_date: reg.background_cert_date || null,
           verified: false,
           featured: false,
           rating: 0,

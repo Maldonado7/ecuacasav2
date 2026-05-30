@@ -12,19 +12,21 @@ function getSupabaseClient() {
 }
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+// Background certificates may also be PDFs.
+const ALLOWED_CERT_TYPES = [...ALLOWED_IMAGE_TYPES, 'application/pdf'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 function getFileExtension(filename: string): string {
   const ext = filename.split('.').pop()?.toLowerCase();
-  if (!ext || !['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'].includes(ext)) {
+  if (!ext || !['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif', 'pdf'].includes(ext)) {
     return 'jpg';
   }
   return ext;
 }
 
-function validateFile(file: File): string | null {
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-    return `Tipo de archivo no permitido: ${file.type}. Solo se aceptan imágenes (JPEG, PNG, WebP).`;
+function validateFile(file: File, allowed: string[] = ALLOWED_IMAGE_TYPES): string | null {
+  if (!allowed.includes(file.type)) {
+    return `Tipo de archivo no permitido: ${file.type}.`;
   }
   if (file.size > MAX_FILE_SIZE) {
     return `Archivo demasiado grande (${(file.size / 1024 / 1024).toFixed(1)}MB). Máximo 5MB.`;
@@ -80,6 +82,9 @@ export async function POST(request: NextRequest) {
     let cedulaPhotoFile: File | null = null;
     let profilePhotoFile: File | null = null;
     let logoFile: File | null = null;
+    let backgroundCertFile: File | null = null;
+    let background_cert_code: string | null = null;
+    let background_cert_date: string | null = null;
 
     if (isFormData) {
       const formData = await request.formData();
@@ -96,7 +101,10 @@ export async function POST(request: NextRequest) {
       company_name = (formData.get('company_name') as string) || null;
       ruc = (formData.get('ruc') as string) || null;
       business_hours = (formData.get('business_hours') as string) || null;
+      background_cert_code = (formData.get('background_cert_code') as string) || null;
+      background_cert_date = (formData.get('background_cert_date') as string) || null;
       logoFile = formData.get('logo') as File | null;
+      backgroundCertFile = formData.get('background_cert') as File | null;
       reference1_name = (formData.get('reference1_name') as string) || null;
       reference1_phone = (formData.get('reference1_phone') as string) || null;
       reference2_name = (formData.get('reference2_name') as string) || null;
@@ -123,6 +131,12 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: fileError }, { status: 400 });
         }
       }
+      if (backgroundCertFile && backgroundCertFile.size > 0) {
+        const fileError = validateFile(backgroundCertFile, ALLOWED_CERT_TYPES);
+        if (fileError) {
+          return NextResponse.json({ error: fileError }, { status: 400 });
+        }
+      }
     } else {
       // JSON fallback (for /for-providers or legacy clients)
       const data = await request.json();
@@ -138,6 +152,8 @@ export async function POST(request: NextRequest) {
       company_name = data.company_name || null;
       ruc = data.ruc || null;
       business_hours = data.business_hours || null;
+      background_cert_code = data.background_cert_code || null;
+      background_cert_date = data.background_cert_date || null;
     }
 
     // Identity validation by provider type (reject malformed IDs at submit)
@@ -206,6 +222,8 @@ export async function POST(request: NextRequest) {
         company_name,
         ruc,
         business_hours,
+        background_cert_code,
+        background_cert_date: background_cert_date || null,
         reference1_name,
         reference1_phone,
         reference2_name,
@@ -227,6 +245,7 @@ export async function POST(request: NextRequest) {
     let cedula_photo_url: string | null = null;
     let profile_photo_url: string | null = null;
     let logo_url: string | null = null;
+    let background_cert_url: string | null = null;
 
     // Upload files to Supabase Storage (private bucket — paths stored, not public URLs)
     if (cedulaPhotoFile && cedulaPhotoFile.size > 0) {
@@ -286,12 +305,32 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (backgroundCertFile && backgroundCertFile.size > 0) {
+      const ext = getFileExtension(backgroundCertFile.name);
+      const storagePath = `${recordId}/background-cert.${ext}`;
+      const buffer = Buffer.from(await backgroundCertFile.arrayBuffer());
+
+      const { error: uploadError } = await supabase.storage
+        .from('registration-uploads')
+        .upload(storagePath, buffer, {
+          contentType: backgroundCertFile.type,
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error('Background cert upload error:', uploadError);
+      } else {
+        background_cert_url = storagePath;
+      }
+    }
+
     // Update record with photo URLs if uploaded
-    if (cedula_photo_url || profile_photo_url || logo_url) {
+    if (cedula_photo_url || profile_photo_url || logo_url || background_cert_url) {
       const updateData: Record<string, string> = {};
       if (cedula_photo_url) updateData.cedula_photo_url = cedula_photo_url;
       if (profile_photo_url) updateData.profile_photo_url = profile_photo_url;
       if (logo_url) updateData.logo_url = logo_url;
+      if (background_cert_url) updateData.background_cert_url = background_cert_url;
 
       const { error: updateError } = await supabase
         .from('registration_requests')

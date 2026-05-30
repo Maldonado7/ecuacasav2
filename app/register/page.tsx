@@ -44,6 +44,9 @@ const registrationSchema = z.object({
   company_name: z.string().optional().or(z.literal('')),
   ruc: z.string().optional().or(z.literal('')),
   business_hours: z.string().optional(),
+  // Optional, voluntary background certificate (never required — Decreto 1166)
+  background_cert_code: z.string().optional(),
+  background_cert_date: z.string().optional(),
   services: z.array(z.string()).min(1, 'Selecciona al menos un servicio'),
   areas_served: z.array(z.string()).min(1, 'Selecciona al menos un sector'),
   speaks_english: z.boolean(),
@@ -125,6 +128,7 @@ export default function RegisterPage() {
   const [cedulaPhoto, setCedulaPhoto] = useState<File | null>(null);
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [logoPhoto, setLogoPhoto] = useState<File | null>(null);
+  const [backgroundCert, setBackgroundCert] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [phoneError, setPhoneError] = useState<string | null>(null);
 
@@ -148,6 +152,8 @@ export default function RegisterPage() {
       company_name: '',
       ruc: '',
       business_hours: '',
+      background_cert_code: '',
+      background_cert_date: '',
       services: [],
       areas_served: [],
       speaks_english: false,
@@ -252,6 +258,8 @@ export default function RegisterPage() {
       formData.append('company_name', data.company_name || '');
       formData.append('ruc', data.ruc || '');
       formData.append('business_hours', data.business_hours || '');
+      formData.append('background_cert_code', data.background_cert_code || '');
+      formData.append('background_cert_date', data.background_cert_date || '');
       formData.append('services', JSON.stringify(data.services));
       formData.append('areas_served', JSON.stringify(data.areas_served));
       formData.append('speaks_english', String(data.speaks_english));
@@ -263,6 +271,7 @@ export default function RegisterPage() {
       if (cedulaPhoto) formData.append('cedula_photo', cedulaPhoto);
       if (profilePhoto) formData.append('profile_photo', profilePhoto);
       if (logoPhoto) formData.append('logo', logoPhoto);
+      if (backgroundCert) formData.append('background_cert', backgroundCert);
 
       const response = await fetch('/api/register', {
         method: 'POST',
@@ -775,6 +784,61 @@ export default function RegisterPage() {
                   </div>
                   </>
                   )}
+
+                  {/* Optional background certificate — voluntary, never required */}
+                  <div className="border rounded-lg p-4 space-y-4">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Récord policial (opcional)</h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Comparte tu récord limpio para un badge extra de confianza — totalmente opcional.
+                        Puedes obtenerlo gratis en el portal del Ministerio del Interior.
+                      </p>
+                    </div>
+                    <div>
+                      <Label htmlFor="background_cert">Archivo del certificado (PDF o imagen)</Label>
+                      <label
+                        htmlFor="background_cert"
+                        className={`mt-1 flex items-center gap-3 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                          backgroundCert ? 'border-green-400 bg-green-50' : 'border-gray-300 hover:border-primary-400'
+                        }`}
+                      >
+                        <Upload className="w-5 h-5 text-gray-400" />
+                        <span className="text-sm text-gray-600">
+                          {backgroundCert ? backgroundCert.name : 'Seleccionar archivo...'}
+                        </span>
+                        <input
+                          id="background_cert"
+                          type="file"
+                          accept="image/*,application/pdf"
+                          className="hidden"
+                          onChange={(e) => {
+                            setBackgroundCert(e.target.files?.[0] || null);
+                            setFileError(null);
+                          }}
+                        />
+                      </label>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="background_cert_code">Código de verificación</Label>
+                        <Input
+                          id="background_cert_code"
+                          {...register('background_cert_code')}
+                          className="mt-1"
+                          placeholder="Código del certificado"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="background_cert_date">Fecha de emisión</Label>
+                        <Input
+                          id="background_cert_date"
+                          type="date"
+                          {...register('background_cert_date')}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Message */}
                   <div>

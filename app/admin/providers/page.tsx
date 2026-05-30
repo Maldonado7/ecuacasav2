@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
-import { Plus, Edit, Trash2, CheckCircle, Star, ImageIcon, X, Check, Lock, Loader2, Users, Search, MessageSquarePlus } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, Star, ImageIcon, X, Check, Lock, Loader2, Users, Search, MessageSquarePlus, ShieldCheck } from 'lucide-react';
 
 interface Provider {
   id: string;
@@ -16,6 +16,7 @@ interface Provider {
   rating: number;
   verified: boolean;
   featured: boolean;
+  background_verified: boolean;
   status: string;
   speaks_english: boolean;
   created_at: string;
@@ -256,7 +257,7 @@ export default function AdminProvidersPage() {
     const supabase = createClient();
     const { data } = await supabase
       .from('providers')
-      .select('id, name, slug, phone, photo_url, rating, verified, featured, status, speaks_english, created_at')
+      .select('id, name, slug, phone, photo_url, rating, verified, featured, background_verified, status, speaks_english, created_at')
       .order('created_at', { ascending: false });
 
     setProviders(data || []);
@@ -268,6 +269,16 @@ export default function AdminProvidersPage() {
     await supabase
       .from('providers')
       .update({ featured: !currentValue })
+      .eq('id', id);
+    fetchProviders();
+  }
+
+  // Sub-badge: only flip ON after confirming the cert code on the gov portal.
+  async function toggleBackgroundVerified(id: string, currentValue: boolean) {
+    const supabase = createClient();
+    await supabase
+      .from('providers')
+      .update({ background_verified: !currentValue })
       .eq('id', id);
     fetchProviders();
   }
@@ -459,6 +470,18 @@ export default function AdminProvidersPage() {
                         <Star className="w-3 h-3 inline mr-1" />
                         Destacado
                       </button>
+                      <button
+                        onClick={() => toggleBackgroundVerified(provider.id, provider.background_verified)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                          provider.background_verified
+                            ? 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                            : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
+                        }`}
+                        title="Antecedentes verificado (récord policial)"
+                      >
+                        <ShieldCheck className="w-3 h-3 inline mr-1" />
+                        Antecedentes
+                      </button>
                     </div>
 
                     {/* Actions */}
@@ -579,6 +602,18 @@ export default function AdminProvidersPage() {
                         >
                           <Star className="w-3 h-3 inline mr-1" />
                           Destacado
+                        </button>
+                        <button
+                          onClick={() => toggleBackgroundVerified(provider.id, provider.background_verified)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                            provider.background_verified
+                              ? 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                              : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
+                          }`}
+                          title="Antecedentes verificado (récord policial)"
+                        >
+                          <ShieldCheck className="w-3 h-3 inline mr-1" />
+                          Antecedentes
                         </button>
                       </div>
                     </td>
