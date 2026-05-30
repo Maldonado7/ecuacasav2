@@ -30,7 +30,6 @@ export async function GET() {
     { url: `${BASE_URL}/services`, changefreq: 'weekly', priority: 0.9 },
     { url: `${BASE_URL}/providers`, changefreq: 'daily', priority: 0.9 },
     { url: `${BASE_URL}/propiedades`, changefreq: 'daily', priority: 0.9 },
-    { url: `${BASE_URL}/solicitar`, changefreq: 'monthly', priority: 0.9 },
     { url: `${BASE_URL}/blog`, changefreq: 'weekly', priority: 0.8 },
     { url: `${BASE_URL}/how-it-works`, changefreq: 'monthly', priority: 0.7 },
     { url: `${BASE_URL}/for-providers`, changefreq: 'monthly', priority: 0.7 },

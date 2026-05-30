@@ -206,7 +206,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         {/* Cross-links */}
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Link
-            href="/solicitar"
+            href="/providers"
             className="p-6 bg-purple-50 rounded-2xl text-center hover:bg-purple-100 transition-colors group"
           >
             <h3 className="font-bold text-gray-900 mb-1 group-hover:text-purple-700">

@@ -93,7 +93,7 @@ export default function HowItWorksPage() {
 
           <div className="text-center mt-12">
             <Link
-              href="/solicitar"
+              href="/providers"
               className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:shadow-xl hover:scale-105 transition-all text-lg"
             >
               {t('hiw.cta_request')}
@@ -179,7 +179,7 @@ export default function HowItWorksPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/solicitar"
+              href="/providers"
               className="inline-block px-8 py-4 bg-white text-purple-600 font-bold rounded-xl transition-all shadow-lg hover:shadow-xl hover:scale-105"
             >
               {t('hiw.cta_request')}

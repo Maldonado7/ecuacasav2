@@ -142,7 +142,7 @@ export default async function ServicePage({ params }: ServicePageProps) {
             </p>
           </div>
           <Link
-            href={`/solicitar?service=${service.slug}`}
+            href={`/providers?service=${service.slug}`}
             className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all whitespace-nowrap"
           >
             Solicitar Servicio
@@ -273,7 +273,7 @@ export default async function ServicePage({ params }: ServicePageProps) {
               Aún no tenemos profesionales registrados para este servicio.
             </p>
             <Link
-              href={`/solicitar?service=${service.slug}`}
+              href={`/providers?service=${service.slug}`}
               className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-lg transition-colors"
             >
               Solicitar este servicio

@@ -13,7 +13,6 @@ export function Footer() {
       { href: '/services', label: t('nav.services') },
       { href: '/providers', label: t('nav.providers') },
       { href: '/propiedades', label: t('nav.properties') },
-      { href: '/solicitar', label: t('nav.request_service') },
     ],
     company: [
       { href: '/how-it-works', label: t('nav.how_it_works') },
