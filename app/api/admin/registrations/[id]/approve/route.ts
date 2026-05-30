@@ -58,6 +58,11 @@ export async function POST(
           photo_url: reg.profile_photo_url || null,
           description_es: reg.message || null,
           speaks_english: reg.speaks_english || false,
+          kind: reg.kind || 'individual',
+          company_name: reg.company_name || null,
+          ruc: reg.ruc || null,
+          business_hours: reg.business_hours || null,
+          logo_url: reg.logo_url || null,
           status: 'active',
         })
         .eq('id', existingProvider.id);
@@ -89,9 +94,14 @@ export async function POST(
           photo_url: reg.profile_photo_url || null,
           description_es: reg.message || null,
           speaks_english: reg.speaks_english || false,
+          kind: reg.kind || 'individual',
+          company_name: reg.company_name || null,
+          ruc: reg.ruc || null,
+          business_hours: reg.business_hours || null,
+          logo_url: reg.logo_url || null,
           verified: false,
           featured: false,
-          rating: 5,
+          rating: 0,
           review_count: 0,
           status: 'active',
         })

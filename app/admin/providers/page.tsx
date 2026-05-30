@@ -271,12 +271,43 @@ export default function AdminProvidersPage() {
     fetchProviders();
   }
 
+  // Two-gate verification (Task 3). Listed (verified=false) providers show
+  // publicly without a badge; flipping the badge ON requires an explicit
+  // human-check note. Demoting revokes the badge and can suspend the listing.
   async function toggleVerified(id: string, currentValue: boolean) {
-    const supabase = createClient();
-    await supabase
-      .from('providers')
-      .update({ verified: !currentValue })
-      .eq('id', id);
+    if (!currentValue) {
+      const notes = window.prompt(
+        'Para marcar como VERIFICADO confirma el chequeo humano.\n\n' +
+        'Persona: ¿llamaste a las referencias?\nEmpresa: ¿verificaste el RUC y el negocio?\n\n' +
+        'Escribe una nota (quién confirmó / qué revisaste):'
+      );
+      if (!notes || notes.trim().length < 3) return;
+      const res = await fetch('/api/admin/providers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action: 'verify', verification_notes: notes.trim() }),
+      });
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        alert(e.error || 'No se pudo verificar');
+        return;
+      }
+    } else {
+      if (!window.confirm('¿Quitar el badge "Verificado" de este perfil?')) return;
+      const suspend = window.confirm(
+        '¿También suspender el perfil (ocultarlo)?\n\nAceptar = suspender · Cancelar = mantener listado sin badge'
+      );
+      const res = await fetch('/api/admin/providers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action: 'unverify', suspend }),
+      });
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        alert(e.error || 'No se pudo actualizar');
+        return;
+      }
+    }
     fetchProviders();
   }
 

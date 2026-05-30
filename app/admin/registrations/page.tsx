@@ -22,6 +22,10 @@ interface Registration {
   areas_served: string[] | null;
   speaks_english: boolean;
   message: string | null;
+  kind: 'individual' | 'company' | null;
+  company_name: string | null;
+  ruc: string | null;
+  business_hours: string | null;
   cedula_number: string | null;
   cedula_photo_url: string | null;
   profile_photo_url: string | null;
@@ -272,7 +276,25 @@ export default function AdminRegistrationsPage() {
                         </div>
                       )}
 
-                      {reg.cedula_number && (
+                      {reg.kind === 'company' && (
+                        <div className="text-sm text-gray-500 mb-3 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center rounded-full bg-purple-50 px-2 py-0.5 text-xs font-semibold text-purple-700">Empresa</span>
+                            {reg.company_name && <span className="font-medium text-gray-700">{reg.company_name}</span>}
+                          </div>
+                          {reg.ruc && (
+                            <div className="flex items-center gap-2">
+                              <CreditCard className="w-3.5 h-3.5" />
+                              <span className="font-medium text-gray-700">RUC:</span> {reg.ruc}
+                            </div>
+                          )}
+                          {reg.business_hours && (
+                            <div><span className="font-medium text-gray-700">Horario:</span> {reg.business_hours}</div>
+                          )}
+                        </div>
+                      )}
+
+                      {reg.kind !== 'company' && reg.cedula_number && (
                         <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                           <CreditCard className="w-3.5 h-3.5" />
                           <span className="font-medium text-gray-700">Cédula:</span> {reg.cedula_number}
