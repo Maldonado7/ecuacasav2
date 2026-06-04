@@ -1,15 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { MapPin, ClipboardList, Zap, CheckCircle } from 'lucide-react';
+import { MapPin, Search, MessageCircle, CheckCircle } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 
 export function HeroSection() {
   const { t } = useTranslation();
 
   const steps = [
-    { icon: ClipboardList, text: t('hero.step1'), number: '1' },
-    { icon: Zap, text: t('hero.step2'), number: '2' },
+    { icon: Search, text: t('hero.step1'), number: '1' },
+    { icon: MessageCircle, text: t('hero.step2'), number: '2' },
     { icon: CheckCircle, text: t('hero.step3'), number: '3' },
   ];
 
@@ -50,12 +50,6 @@ export function HeroSection() {
               className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-base sm:text-lg rounded-xl hover:shadow-xl hover:scale-105 transition-all"
             >
               {t('hero.cta_providers')}
-            </Link>
-            <Link
-              href="/propiedades"
-              className="px-6 sm:px-8 py-3 sm:py-4 bg-white text-gray-800 font-bold text-base sm:text-lg rounded-xl border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all"
-            >
-              {t('hero.cta_properties')}
             </Link>
           </div>
 

@@ -1,20 +1,20 @@
 'use client';
 
 import { useTranslation } from '@/hooks/use-translation';
-import { ClipboardList, Zap, CheckCircle } from 'lucide-react';
+import { Search, MessageCircle, CheckCircle } from 'lucide-react';
 
 export function HowItWorks() {
   const { t, locale } = useTranslation();
 
   const steps = [
     {
-      icon: ClipboardList,
+      icon: Search,
       titleKey: 'how_it_works.new_step1_title',
       descKey: 'how_it_works.new_step1_desc',
       number: 1,
     },
     {
-      icon: Zap,
+      icon: MessageCircle,
       titleKey: 'how_it_works.new_step2_title',
       descKey: 'how_it_works.new_step2_desc',
       number: 2,
