@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         description_en: data.description_en || null,
         price_range: data.price_range || null,
         response_time: data.response_time || null,
-        rating: data.rating || 5,
+        rating: data.rating || 0,
         review_count: data.review_count || 0,
         speaks_english: data.speaks_english || false,
         verified: data.verified || false,
@@ -203,6 +203,74 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error updating provider:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+// Two-gate verification actions (Task 3).
+//  - verify: flip the green "Verificado" badge ON. Requires an explicit human
+//    check note (references called for individuals / RUC + business confirmed
+//    for companies). Records who confirmed via verification_notes + verified_at.
+//  - unverify: revoke the badge in one click (e.g. after a complaint/no-show),
+//    optionally suspending the listing.
+export async function PATCH(request: NextRequest) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
+  const supabase = getSupabaseClient();
+  try {
+    const { id, action, verification_notes, suspend } = await request.json();
+
+    if (!id || !action) {
+      return NextResponse.json({ error: 'id and action are required' }, { status: 400 });
+    }
+
+    if (action === 'verify') {
+      // Must record an explicit human confirmation before granting the badge.
+      if (!verification_notes || String(verification_notes).trim().length < 3) {
+        return NextResponse.json(
+          { error: 'Debes confirmar que llamaste a las referencias / verificaste el negocio antes de marcar como Verificado.' },
+          { status: 400 }
+        );
+      }
+
+      const { error } = await supabase
+        .from('providers')
+        .update({
+          verified: true,
+          verified_at: new Date().toISOString(),
+          verification_notes: String(verification_notes).trim(),
+          status: 'active',
+        })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Provider verify error:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      return NextResponse.json({ success: true, verified: true });
+    }
+
+    if (action === 'unverify') {
+      const { error } = await supabase
+        .from('providers')
+        .update({
+          verified: false,
+          verified_at: null,
+          ...(suspend ? { status: 'suspended' } : {}),
+        })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Provider unverify error:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      return NextResponse.json({ success: true, verified: false });
+    }
+
+    return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
+  } catch (error) {
+    console.error('Error patching provider:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

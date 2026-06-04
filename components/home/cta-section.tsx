@@ -20,13 +20,8 @@ export function CTASection() {
           {t('cta.new_subtitle')}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-          <Link href="/solicitar">
-            <button className="bg-white text-purple-600 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg hover:scale-105 transition-all shadow-xl hover:shadow-2xl">
-              {t('cta.request_service')}
-            </button>
-          </Link>
           <Link href="/providers">
-            <button className="border-2 border-white text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg hover:bg-white/10 transition-all">
+            <button className="bg-white text-purple-600 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg hover:scale-105 transition-all shadow-xl hover:shadow-2xl">
               {t('cta.browse_providers')}
             </button>
           </Link>

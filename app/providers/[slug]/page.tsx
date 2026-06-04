@@ -70,9 +70,21 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
               {/* Badges */}
               <div className="absolute top-4 right-4 flex gap-2">
                 {provider.verified && (
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 text-sm font-medium">
+                  <div
+                    title="Identidad (cédula o RUC) verificada y referencias o negocio confirmados por nuestro equipo."
+                    className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 text-sm font-medium cursor-help"
+                  >
                     <CheckCircle className="w-4 h-4" />
                     Verificado
+                  </div>
+                )}
+                {provider.background_verified && (
+                  <div
+                    title="Récord policial (antecedentes penales) verificado por nuestro equipo."
+                    className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 text-sm font-medium cursor-help"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Antecedentes
                   </div>
                 )}
                 {provider.featured && (
@@ -110,8 +122,16 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
                     {provider.name}
                   </h1>
                   <div className="flex flex-wrap items-center gap-4">
-                    <RatingStars rating={provider.rating} size="md" showValue className="text-white" />
-                    <span className="text-white/80">({provider.review_count} reseñas)</span>
+                    {provider.review_count > 0 ? (
+                      <>
+                        <RatingStars rating={provider.rating} size="md" showValue className="text-white" />
+                        <span className="text-white/80">({provider.review_count} reseñas)</span>
+                      </>
+                    ) : (
+                      <span className="inline-flex items-center rounded-full bg-white/20 px-3 py-1 text-sm font-medium text-white">
+                        Nuevo
+                      </span>
+                    )}
                   </div>
                   {provider.speaks_english && (
                     <Badge className="mt-3 bg-white/20 text-white border-0">
@@ -206,7 +226,7 @@ export default async function ProviderPage({ params }: ProviderPageProps) {
         {/* Cross-links */}
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Link
-            href="/solicitar"
+            href="/providers"
             className="p-6 bg-purple-50 rounded-2xl text-center hover:bg-purple-100 transition-colors group"
           >
             <h3 className="font-bold text-gray-900 mb-1 group-hover:text-purple-700">

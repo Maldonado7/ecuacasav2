@@ -46,14 +46,8 @@ export function HeroSection() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-16">
             <Link
-              href="/solicitar"
-              className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-base sm:text-lg rounded-xl hover:shadow-xl hover:scale-105 transition-all"
-            >
-              {t('hero.cta_request')}
-            </Link>
-            <Link
               href="/providers"
-              className="px-6 sm:px-8 py-3 sm:py-4 bg-white text-gray-800 font-bold text-base sm:text-lg rounded-xl border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all"
+              className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-base sm:text-lg rounded-xl hover:shadow-xl hover:scale-105 transition-all"
             >
               {t('hero.cta_providers')}
             </Link>

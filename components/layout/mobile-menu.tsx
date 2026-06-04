@@ -85,13 +85,14 @@ export function MobileMenu({ open, onClose, navLinks }: MobileMenuProps) {
               ))}
             </ul>
 
-            {/* Solicitar CTA */}
+            {/* Browse providers CTA */}
             <div className="mt-4">
               <Link
-                href="/solicitar"
+                href="/providers"
+                onClick={onClose}
                 className="block w-full text-center px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
               >
-                {t('nav.request_service')}
+                {t('cta.browse_providers')}
               </Link>
             </div>
           </nav>

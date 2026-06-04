@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { ServiceJsonLd, BreadcrumbJsonLd, FAQJsonLd } from '@/components/seo/json-ld';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { RatingStars } from '@/components/shared/rating-stars';
+import { ProviderRating } from '@/components/shared/provider-rating';
 import { WhatsAppButton } from '@/components/shared/whatsapp-button';
 import { servicesRepository, providersRepository } from '@/lib/repositories';
 import { SERVICE_ICONS, DEFAULT_SERVICE_ICON } from '@/lib/constants';
@@ -142,7 +142,7 @@ export default async function ServicePage({ params }: ServicePageProps) {
             </p>
           </div>
           <Link
-            href={`/solicitar?service=${service.slug}`}
+            href={`/providers?service=${service.slug}`}
             className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all whitespace-nowrap"
           >
             Solicitar Servicio
@@ -206,7 +206,10 @@ export default async function ServicePage({ params }: ServicePageProps) {
                       />
                       {/* Verified Badge Overlay */}
                       {provider.verified && (
-                        <div className="absolute top-3 right-3 bg-success text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-medium shadow-lg">
+                        <div
+                          title="Identidad (cédula o RUC) verificada y referencias o negocio confirmados por nuestro equipo."
+                          className="absolute top-3 right-3 bg-success text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-medium shadow-lg cursor-help"
+                        >
                           <CheckCircle className="w-3.5 h-3.5" />
                           Verificado
                         </div>
@@ -225,10 +228,10 @@ export default async function ServicePage({ params }: ServicePageProps) {
                     {/* Key Stats */}
                     <div className="space-y-2 mb-4">
                       {/* Rating */}
-                      <div className="flex items-center gap-2">
-                        <RatingStars rating={provider.rating} size="sm" showValue />
-                        <span className="text-sm text-gray-500">({provider.review_count})</span>
-                      </div>
+                      <ProviderRating
+                        rating={provider.rating}
+                        reviewCount={provider.review_count}
+                      />
 
                       {/* Response Time & Price */}
                       <div className="flex items-center justify-between text-sm">
@@ -273,7 +276,7 @@ export default async function ServicePage({ params }: ServicePageProps) {
               Aún no tenemos profesionales registrados para este servicio.
             </p>
             <Link
-              href={`/solicitar?service=${service.slug}`}
+              href={`/providers?service=${service.slug}`}
               className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-lg transition-colors"
             >
               Solicitar este servicio

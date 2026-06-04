@@ -54,10 +54,10 @@ export function Navbar() {
                 </Link>
               ))}
               <Link
-                href="/solicitar"
+                href="/providers"
                 className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all text-sm"
               >
-                {t('nav.request_service')}
+                {t('cta.browse_providers')}
               </Link>
             </div>
 

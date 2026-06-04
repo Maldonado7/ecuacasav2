@@ -110,6 +110,67 @@ export default function ForProvidersPage() {
         </div>
       </section>
 
+      {/* Pricing tiers (Task 7). The fee is not live yet — these describe the
+          plans. Free stays a real basic listing; paid plans are optional. */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              {locale === 'en' ? 'Plans' : 'Planes'}
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              {locale === 'en'
+                ? 'Start free. Upgrade when you want more visibility and trust signals.'
+                : 'Empieza gratis. Mejora cuando quieras más visibilidad y señales de confianza.'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Free */}
+            <div className="rounded-2xl border-2 border-gray-100 p-8 flex flex-col">
+              <h3 className="text-xl font-bold text-gray-900">{locale === 'en' ? 'Free' : 'Gratis'}</h3>
+              <p className="mt-2 text-3xl font-black text-gray-900">$0</p>
+              <ul className="mt-6 space-y-3 text-sm text-gray-600 flex-1">
+                <li>✓ {locale === 'en' ? 'Basic public listing' : 'Perfil público básico'}</li>
+                <li>✓ {locale === 'en' ? 'Direct WhatsApp contact' : 'Contacto directo por WhatsApp'}</li>
+                <li>✓ {locale === 'en' ? 'Customer reviews' : 'Reseñas de clientes'}</li>
+              </ul>
+            </div>
+
+            {/* Listed */}
+            <div className="rounded-2xl border-2 border-purple-200 p-8 flex flex-col">
+              <h3 className="text-xl font-bold text-gray-900">{locale === 'en' ? 'Listed' : 'Listado'}</h3>
+              <p className="mt-2 text-3xl font-black text-gray-900">{locale === 'en' ? 'Paid' : 'De pago'}</p>
+              <ul className="mt-6 space-y-3 text-sm text-gray-600 flex-1">
+                <li>✓ {locale === 'en' ? 'Everything in Free' : 'Todo lo del plan Gratis'}</li>
+                <li>✓ {locale === 'en' ? 'Eligible for the Verified badge' : 'Elegible para el badge Verificado'}</li>
+                <li>✓ {locale === 'en' ? '"Speaks English" tag' : 'Etiqueta "Habla inglés"'}</li>
+              </ul>
+            </div>
+
+            {/* Featured */}
+            <div className="rounded-2xl border-2 border-pink-300 p-8 flex flex-col relative">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                {locale === 'en' ? 'Most visibility' : 'Más visibilidad'}
+              </span>
+              <h3 className="text-xl font-bold text-gray-900">{locale === 'en' ? 'Featured' : 'Destacado'}</h3>
+              <p className="mt-2 text-3xl font-black text-gray-900">{locale === 'en' ? 'Paid' : 'De pago'}</p>
+              <ul className="mt-6 space-y-3 text-sm text-gray-600 flex-1">
+                <li>✓ {locale === 'en' ? 'Everything in Listed' : 'Todo lo del plan Listado'}</li>
+                <li>✓ {locale === 'en' ? 'Top placement in search' : 'Posición destacada en búsquedas'}</li>
+                <li>✓ {locale === 'en' ? 'Homepage feature' : 'Aparece en la página de inicio'}</li>
+              </ul>
+            </div>
+          </div>
+
+          <p className="mt-10 text-center text-sm text-gray-500">
+            {locale === 'en'
+              ? 'Paid plans are rolling out soon. For now, list for free — we will reach out when plans go live.'
+              : 'Los planes de pago se activarán pronto. Por ahora, regístrate gratis — te contactaremos cuando estén disponibles.'}
+          </p>
+        </div>
+      </section>
+
     </div>
   );
 }

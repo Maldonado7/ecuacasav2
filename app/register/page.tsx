@@ -12,26 +12,41 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { createClient } from '@/lib/supabase/client';
 import { COVERAGE_SECTORS } from '@/lib/constants';
-import { isValidEcuadorCedula, isValidEcuadorPhone, normalizeEcuadorPhone } from '@/lib/validations';
-import { CheckCircle, ArrowLeft, ArrowRight, Loader2, Upload } from 'lucide-react';
+import { isValidEcuadorCedula, isValidEcuadorPhone, isValidEcuadorRuc, normalizeEcuadorPhone } from '@/lib/validations';
+import { CheckCircle, ArrowLeft, ArrowRight, Loader2, Upload, Building2, User } from 'lucide-react';
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 
-const STEPS = [
-  { title: 'Información básica', subtitle: 'Tu nombre y datos de contacto' },
-  { title: 'Verificación de identidad', subtitle: 'Para garantizar confianza en la plataforma' },
-  { title: 'Tus servicios', subtitle: 'Qué ofreces y dónde trabajas' },
-  { title: 'Últimos detalles', subtitle: 'Referencias y más sobre ti' },
-];
+// Step titles differ slightly between company and individual flows.
+function stepsFor(kind: 'individual' | 'company') {
+  return [
+    { title: 'Tipo de cuenta', subtitle: '¿Eres una empresa o una persona?' },
+    { title: 'Información básica', subtitle: kind === 'company' ? 'Datos de contacto' : 'Tu nombre y datos de contacto' },
+    kind === 'company'
+      ? { title: 'Datos de la empresa', subtitle: 'RUC y detalles del negocio' }
+      : { title: 'Verificación de identidad', subtitle: 'Para garantizar confianza en la plataforma' },
+    { title: 'Servicios', subtitle: 'Qué ofreces y dónde trabajas' },
+    kind === 'company'
+      ? { title: 'Últimos detalles', subtitle: 'Más sobre la empresa' }
+      : { title: 'Últimos detalles', subtitle: 'Referencias y más sobre ti' },
+  ];
+}
 
 const registrationSchema = z.object({
+  kind: z.enum(['individual', 'company']),
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   display_name: z.string().min(2, 'El nombre para mostrar debe tener al menos 2 caracteres'),
   phone: z.string().min(9, 'Ingresa un número de teléfono válido').max(10, 'Número demasiado largo'),
   email: z.string().email('Ingresa un email válido').optional().or(z.literal('')),
-  cedula_number: z.string()
-    .regex(/^\d{10}$/, 'La cédula debe tener exactamente 10 dígitos')
-    .refine(isValidEcuadorCedula, 'Número de cédula inválido'),
+  // Individual-only; validated conditionally in superRefine
+  cedula_number: z.string().optional().or(z.literal('')),
+  // Company-only; validated conditionally in superRefine
+  company_name: z.string().optional().or(z.literal('')),
+  ruc: z.string().optional().or(z.literal('')),
+  business_hours: z.string().optional(),
+  // Optional, voluntary background certificate (never required — Decreto 1166)
+  background_cert_code: z.string().optional(),
+  background_cert_date: z.string().optional(),
   services: z.array(z.string()).min(1, 'Selecciona al menos un servicio'),
   areas_served: z.array(z.string()).min(1, 'Selecciona al menos un sector'),
   speaks_english: z.boolean(),
@@ -43,6 +58,22 @@ const registrationSchema = z.object({
     .refine((v) => !v || isValidEcuadorPhone(v), 'Formato inválido. Usa 09XXXXXXXX o +593XXXXXXXXX'),
   message: z.string().optional(),
 }).superRefine((data, ctx) => {
+  // Conditional identity validation by provider type
+  if (data.kind === 'company') {
+    if (!data.company_name || data.company_name.trim().length < 2) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Ingresa el nombre de la empresa', path: ['company_name'] });
+    }
+    if (!data.ruc || !isValidEcuadorRuc(data.ruc)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'RUC inválido. Deben ser 13 dígitos válidos.', path: ['ruc'] });
+    }
+  } else {
+    if (!data.cedula_number || !/^\d{10}$/.test(data.cedula_number)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'La cédula debe tener exactamente 10 dígitos', path: ['cedula_number'] });
+    } else if (!isValidEcuadorCedula(data.cedula_number)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Número de cédula inválido', path: ['cedula_number'] });
+    }
+  }
+
   const ownPhone = normalizeEcuadorPhone(data.phone);
   const ref1Phone = data.reference1_phone ? normalizeEcuadorPhone(data.reference1_phone) : '';
   const ref2Phone = data.reference2_phone ? normalizeEcuadorPhone(data.reference2_phone) : '';
@@ -72,13 +103,16 @@ const registrationSchema = z.object({
 
 type RegistrationForm = z.infer<typeof registrationSchema>;
 
-// Fields that must be valid before advancing from each step
-const STEP_FIELDS: (keyof RegistrationForm)[][] = [
-  ['name', 'phone'],           // Step 1
-  ['cedula_number'],           // Step 2
-  ['services', 'areas_served'],// Step 3
-  [],                          // Step 4 — all optional
-];
+// Fields that must be valid before advancing from each step (depends on kind)
+function stepFieldsFor(kind: 'individual' | 'company'): (keyof RegistrationForm)[][] {
+  return [
+    ['kind'],                                              // Step 0 — choose type
+    ['name', 'display_name', 'phone'],                     // Step 1 — basics
+    kind === 'company' ? ['company_name', 'ruc'] : ['cedula_number'], // Step 2 — identity
+    ['services', 'areas_served'],                          // Step 3 — services
+    [],                                                    // Step 4 — all optional
+  ];
+}
 
 interface Service {
   slug: string;
@@ -93,6 +127,8 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
   const [cedulaPhoto, setCedulaPhoto] = useState<File | null>(null);
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const [logoPhoto, setLogoPhoto] = useState<File | null>(null);
+  const [backgroundCert, setBackgroundCert] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [phoneError, setPhoneError] = useState<string | null>(null);
 
@@ -107,11 +143,17 @@ export default function RegisterPage() {
     resolver: zodResolver(registrationSchema),
     mode: 'onTouched',
     defaultValues: {
+      kind: 'individual',
       name: '',
       display_name: '',
       phone: '',
       email: '',
       cedula_number: '',
+      company_name: '',
+      ruc: '',
+      business_hours: '',
+      background_cert_code: '',
+      background_cert_date: '',
       services: [],
       areas_served: [],
       speaks_english: false,
@@ -125,6 +167,8 @@ export default function RegisterPage() {
 
   const selectedServices = watch('services');
   const selectedSectors = watch('areas_served');
+  const kind = watch('kind');
+  const STEPS = stepsFor(kind);
 
   useEffect(() => {
     async function fetchData() {
@@ -156,7 +200,7 @@ export default function RegisterPage() {
   };
 
   const handleNext = async () => {
-    const fields = STEP_FIELDS[step];
+    const fields = stepFieldsFor(kind)[step];
     if (fields.length > 0) {
       const valid = await trigger(fields);
       if (!valid) return;
@@ -205,11 +249,17 @@ export default function RegisterPage() {
       }
 
       const formData = new FormData();
+      formData.append('kind', data.kind);
       formData.append('name', data.name);
       formData.append('display_name', data.display_name);
       formData.append('phone', fullPhone);
       formData.append('email', data.email || '');
-      formData.append('cedula_number', data.cedula_number);
+      formData.append('cedula_number', data.cedula_number || '');
+      formData.append('company_name', data.company_name || '');
+      formData.append('ruc', data.ruc || '');
+      formData.append('business_hours', data.business_hours || '');
+      formData.append('background_cert_code', data.background_cert_code || '');
+      formData.append('background_cert_date', data.background_cert_date || '');
       formData.append('services', JSON.stringify(data.services));
       formData.append('areas_served', JSON.stringify(data.areas_served));
       formData.append('speaks_english', String(data.speaks_english));
@@ -220,6 +270,8 @@ export default function RegisterPage() {
       formData.append('message', data.message || '');
       if (cedulaPhoto) formData.append('cedula_photo', cedulaPhoto);
       if (profilePhoto) formData.append('profile_photo', profilePhoto);
+      if (logoPhoto) formData.append('logo', logoPhoto);
+      if (backgroundCert) formData.append('background_cert', backgroundCert);
 
       const response = await fetch('/api/register', {
         method: 'POST',
@@ -341,17 +393,49 @@ export default function RegisterPage() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
-              {/* ========== STEP 1: Información básica ========== */}
+              {/* ========== STEP 0: Tipo de cuenta ========== */}
               {step === 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setValue('kind', 'individual', { shouldValidate: true })}
+                    className={`flex flex-col items-center text-center gap-3 p-6 rounded-xl border-2 transition-all ${
+                      kind === 'individual'
+                        ? 'border-primary-600 bg-primary-50 ring-2 ring-primary-100'
+                        : 'border-gray-200 hover:border-primary-300'
+                    }`}
+                  >
+                    <User className="w-8 h-8 text-primary-600" />
+                    <span className="font-bold text-gray-900">Persona</span>
+                    <span className="text-sm text-gray-500">Profesional independiente. Te verificamos con cédula y referencias.</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setValue('kind', 'company', { shouldValidate: true })}
+                    className={`flex flex-col items-center text-center gap-3 p-6 rounded-xl border-2 transition-all ${
+                      kind === 'company'
+                        ? 'border-primary-600 bg-primary-50 ring-2 ring-primary-100'
+                        : 'border-gray-200 hover:border-primary-300'
+                    }`}
+                  >
+                    <Building2 className="w-8 h-8 text-primary-600" />
+                    <span className="font-bold text-gray-900">Empresa</span>
+                    <span className="text-sm text-gray-500">Negocio registrado. Te verificamos con RUC y datos del negocio.</span>
+                  </button>
+                </div>
+              )}
+
+              {/* ========== STEP 1: Información básica ========== */}
+              {step === 1 && (
                 <>
                   {/* Name */}
                   <div>
-                    <Label htmlFor="name">Nombre completo (legal) *</Label>
+                    <Label htmlFor="name">{kind === 'company' ? 'Nombre de contacto *' : 'Nombre completo (legal) *'}</Label>
                     <Input
                       id="name"
                       {...register('name')}
                       className="mt-1"
-                      placeholder="Ej: Juan García López"
+                      placeholder={kind === 'company' ? 'Persona de contacto' : 'Ej: Juan García López'}
                     />
                     {errors.name && (
                       <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
@@ -360,13 +444,13 @@ export default function RegisterPage() {
 
                   {/* Display Name */}
                   <div>
-                    <Label htmlFor="display_name">Nombre para mostrar *</Label>
+                    <Label htmlFor="display_name">{kind === 'company' ? 'Nombre para mostrar (empresa) *' : 'Nombre para mostrar *'}</Label>
                     <p className="text-sm text-gray-500 mb-1">Este nombre aparecerá en tu tarjeta y perfil público</p>
                     <Input
                       id="display_name"
                       {...register('display_name')}
                       className="mt-1"
-                      placeholder="Ej: David G. o Genoveva Loja"
+                      placeholder={kind === 'company' ? 'Ej: Servicios Andinos' : 'Ej: David G. o Genoveva Loja'}
                     />
                     {errors.display_name && (
                       <p className="text-sm text-red-500 mt-1">{errors.display_name.message}</p>
@@ -413,8 +497,84 @@ export default function RegisterPage() {
                 </>
               )}
 
-              {/* ========== STEP 2: Verificación de identidad ========== */}
-              {step === 1 && (
+              {/* ========== STEP 2: Identidad (individual) / Empresa (company) ========== */}
+              {step === 2 && kind === 'company' && (
+                <>
+                  {/* Company name */}
+                  <div>
+                    <Label htmlFor="company_name">Nombre de la empresa *</Label>
+                    <Input
+                      id="company_name"
+                      {...register('company_name')}
+                      className="mt-1"
+                      placeholder="Ej: Servicios Andinos S.A."
+                    />
+                    {errors.company_name && (
+                      <p className="text-sm text-red-500 mt-1">{errors.company_name.message}</p>
+                    )}
+                  </div>
+
+                  {/* RUC */}
+                  <div>
+                    <Label htmlFor="ruc">RUC *</Label>
+                    <p className="text-sm text-gray-500 mb-1">13 dígitos. Lo verificamos remotamente.</p>
+                    <Input
+                      id="ruc"
+                      inputMode="numeric"
+                      {...register('ruc')}
+                      className="mt-1"
+                      placeholder="0190123456001"
+                    />
+                    {errors.ruc && (
+                      <p className="text-sm text-red-500 mt-1">{errors.ruc.message}</p>
+                    )}
+                  </div>
+
+                  {/* Business hours */}
+                  <div>
+                    <Label htmlFor="business_hours">Horario de atención (opcional)</Label>
+                    <Input
+                      id="business_hours"
+                      {...register('business_hours')}
+                      className="mt-1"
+                      placeholder="Lun–Vie 9:00–18:00, Sáb 9:00–13:00"
+                    />
+                  </div>
+
+                  {/* Logo upload */}
+                  <div>
+                    <Label htmlFor="logo">Logo de la empresa (opcional)</Label>
+                    <p className="text-sm text-gray-500 mb-2">Aparecerá en tu tarjeta y perfil público</p>
+                    <label
+                      htmlFor="logo"
+                      className={`flex items-center gap-3 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                        logoPhoto ? 'border-green-400 bg-green-50' : 'border-gray-300 hover:border-primary-400'
+                      }`}
+                    >
+                      <Upload className="w-5 h-5 text-gray-400" />
+                      <span className="text-sm text-gray-600">
+                        {logoPhoto ? logoPhoto.name : 'Seleccionar archivo...'}
+                      </span>
+                      <input
+                        id="logo"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          setLogoPhoto(e.target.files?.[0] || null);
+                          setFileError(null);
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  {fileError && (
+                    <p className="text-sm text-red-500">{fileError}</p>
+                  )}
+                </>
+              )}
+
+              {step === 2 && kind === 'individual' && (
                 <>
                   {/* Cédula Number */}
                   <div>
@@ -491,7 +651,7 @@ export default function RegisterPage() {
               )}
 
               {/* ========== STEP 3: Tus servicios ========== */}
-              {step === 2 && (
+              {step === 3 && (
                 <>
                   {/* Services */}
                   <div>
@@ -559,9 +719,11 @@ export default function RegisterPage() {
               )}
 
               {/* ========== STEP 4: Últimos detalles ========== */}
-              {step === 3 && (
+              {step === 4 && (
                 <>
-                  {/* Reference 1 */}
+                  {/* References — individuals only (companies are verified via RUC) */}
+                  {kind === 'individual' && (
+                  <>
                   <div className="border rounded-lg p-4 space-y-4">
                     <h3 className="font-semibold text-gray-900">Referencia 1 (opcional)</h3>
                     <div>
@@ -620,10 +782,67 @@ export default function RegisterPage() {
                       )}
                     </div>
                   </div>
+                  </>
+                  )}
+
+                  {/* Optional background certificate — voluntary, never required */}
+                  <div className="border rounded-lg p-4 space-y-4">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Récord policial (opcional)</h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Comparte tu récord limpio para un badge extra de confianza — totalmente opcional.
+                        Puedes obtenerlo gratis en el portal del Ministerio del Interior.
+                      </p>
+                    </div>
+                    <div>
+                      <Label htmlFor="background_cert">Archivo del certificado (PDF o imagen)</Label>
+                      <label
+                        htmlFor="background_cert"
+                        className={`mt-1 flex items-center gap-3 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                          backgroundCert ? 'border-green-400 bg-green-50' : 'border-gray-300 hover:border-primary-400'
+                        }`}
+                      >
+                        <Upload className="w-5 h-5 text-gray-400" />
+                        <span className="text-sm text-gray-600">
+                          {backgroundCert ? backgroundCert.name : 'Seleccionar archivo...'}
+                        </span>
+                        <input
+                          id="background_cert"
+                          type="file"
+                          accept="image/*,application/pdf"
+                          className="hidden"
+                          onChange={(e) => {
+                            setBackgroundCert(e.target.files?.[0] || null);
+                            setFileError(null);
+                          }}
+                        />
+                      </label>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="background_cert_code">Código de verificación</Label>
+                        <Input
+                          id="background_cert_code"
+                          {...register('background_cert_code')}
+                          className="mt-1"
+                          placeholder="Código del certificado"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="background_cert_date">Fecha de emisión</Label>
+                        <Input
+                          id="background_cert_date"
+                          type="date"
+                          {...register('background_cert_date')}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Message */}
                   <div>
-                    <Label htmlFor="message">Cuéntanos sobre ti (opcional)</Label>
+                    <Label htmlFor="message">{kind === 'company' ? 'Cuéntanos sobre la empresa (opcional)' : 'Cuéntanos sobre ti (opcional)'}</Label>
                     <Textarea
                       id="message"
                       {...register('message')}

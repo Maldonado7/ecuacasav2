@@ -1,24 +1,9 @@
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
-import { SolicitarForm } from './solicitar-form';
+import { redirect } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: 'Solicitar Servicio para el Hogar en Cuenca',
-  description: 'Dinos qué necesitas y te conectamos con un profesional verificado en Cuenca en menos de 2 horas. Sin compromiso.',
-  openGraph: {
-    title: 'Solicitar Servicio para el Hogar en Cuenca | EcuaCasa',
-    description: 'Dinos qué necesitas y te conectamos con un profesional verificado en Cuenca en menos de 2 horas. Sin compromiso.',
-  },
-};
-
+// The email-relay request flow has been retired. In the hands-off model the
+// customer contacts the provider directly (WhatsApp). This route is kept only
+// so existing links/SEO don't 404 — it now redirects to the providers listing.
+// The form component and /api/solicitar are intentionally left in place for now.
 export default function SolicitarPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    }>
-      <SolicitarForm />
-    </Suspense>
-  );
+  redirect('/providers');
 }

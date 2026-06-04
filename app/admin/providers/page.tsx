@@ -5,16 +5,19 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
-import { Plus, Edit, Trash2, CheckCircle, Star, ImageIcon, X, Check, Lock, Loader2, Users, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, Star, ImageIcon, X, Check, Lock, Loader2, Users, Search, MessageSquarePlus, ShieldCheck } from 'lucide-react';
 
 interface Provider {
   id: string;
   name: string;
+  slug: string;
   phone: string;
   photo_url: string | null;
   rating: number;
   verified: boolean;
   featured: boolean;
+  background_verified: boolean;
+  plan: string;
   status: string;
   speaks_english: boolean;
   created_at: string;
@@ -255,7 +258,7 @@ export default function AdminProvidersPage() {
     const supabase = createClient();
     const { data } = await supabase
       .from('providers')
-      .select('id, name, phone, photo_url, rating, verified, featured, status, speaks_english, created_at')
+      .select('id, name, slug, phone, photo_url, rating, verified, featured, background_verified, plan, status, speaks_english, created_at')
       .order('created_at', { ascending: false });
 
     setProviders(data || []);
@@ -271,13 +274,76 @@ export default function AdminProvidersPage() {
     fetchProviders();
   }
 
-  async function toggleVerified(id: string, currentValue: boolean) {
+  // Manual billing (Task 7) — no live payment processor yet. Admin records the
+  // plan by hand. plan='featured' also flips the featured placement on.
+  async function setPlan(id: string, plan: string) {
     const supabase = createClient();
     await supabase
       .from('providers')
-      .update({ verified: !currentValue })
+      .update({ plan, ...(plan === 'featured' ? { featured: true } : {}) })
       .eq('id', id);
     fetchProviders();
+  }
+
+  // Sub-badge: only flip ON after confirming the cert code on the gov portal.
+  async function toggleBackgroundVerified(id: string, currentValue: boolean) {
+    const supabase = createClient();
+    await supabase
+      .from('providers')
+      .update({ background_verified: !currentValue })
+      .eq('id', id);
+    fetchProviders();
+  }
+
+  // Two-gate verification (Task 3). Listed (verified=false) providers show
+  // publicly without a badge; flipping the badge ON requires an explicit
+  // human-check note. Demoting revokes the badge and can suspend the listing.
+  async function toggleVerified(id: string, currentValue: boolean) {
+    if (!currentValue) {
+      const notes = window.prompt(
+        'Para marcar como VERIFICADO confirma el chequeo humano.\n\n' +
+        'Persona: ¿llamaste a las referencias?\nEmpresa: ¿verificaste el RUC y el negocio?\n\n' +
+        'Escribe una nota (quién confirmó / qué revisaste):'
+      );
+      if (!notes || notes.trim().length < 3) return;
+      const res = await fetch('/api/admin/providers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action: 'verify', verification_notes: notes.trim() }),
+      });
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        alert(e.error || 'No se pudo verificar');
+        return;
+      }
+    } else {
+      if (!window.confirm('¿Quitar el badge "Verificado" de este perfil?')) return;
+      const suspend = window.confirm(
+        '¿También suspender el perfil (ocultarlo)?\n\nAceptar = suspender · Cancelar = mantener listado sin badge'
+      );
+      const res = await fetch('/api/admin/providers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action: 'unverify', suspend }),
+      });
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        alert(e.error || 'No se pudo actualizar');
+        return;
+      }
+    }
+    fetchProviders();
+  }
+
+  // Copy the per-provider review link the operator sends customers after a job.
+  async function copyReviewLink(slug: string) {
+    const url = `${window.location.origin}/providers/${slug}/review`;
+    try {
+      await navigator.clipboard.writeText(url);
+      alert('Link de reseña copiado:\n' + url);
+    } catch {
+      window.prompt('Copia el link de reseña:', url);
+    }
   }
 
   async function deleteProvider(id: string, name: string) {
@@ -416,6 +482,28 @@ export default function AdminProvidersPage() {
                         <Star className="w-3 h-3 inline mr-1" />
                         Destacado
                       </button>
+                      <button
+                        onClick={() => toggleBackgroundVerified(provider.id, provider.background_verified)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                          provider.background_verified
+                            ? 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                            : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
+                        }`}
+                        title="Antecedentes verificado (récord policial)"
+                      >
+                        <ShieldCheck className="w-3 h-3 inline mr-1" />
+                        Antecedentes
+                      </button>
+                      <select
+                        value={provider.plan || 'free'}
+                        onChange={(e) => setPlan(provider.id, e.target.value)}
+                        title="Plan (facturación manual)"
+                        className="px-2 py-1 rounded-lg text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      >
+                        <option value="free">Plan: Gratis</option>
+                        <option value="listed">Plan: Listado (pagado)</option>
+                        <option value="featured">Plan: Destacado (pagado)</option>
+                      </select>
                     </div>
 
                     {/* Actions */}
@@ -426,6 +514,13 @@ export default function AdminProvidersPage() {
                         title="Foto de tarjeta"
                       >
                         <ImageIcon className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => copyReviewLink(provider.slug)}
+                        className="p-2 rounded-xl text-green-600 bg-green-50 hover:bg-green-100 transition-colors"
+                        title="Copiar link de reseña"
+                      >
+                        <MessageSquarePlus className="w-4 h-4" />
                       </button>
                       <Link href={`/admin/providers/${provider.id}/edit`}>
                         <button className="p-2 rounded-xl text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
@@ -530,6 +625,28 @@ export default function AdminProvidersPage() {
                           <Star className="w-3 h-3 inline mr-1" />
                           Destacado
                         </button>
+                        <button
+                          onClick={() => toggleBackgroundVerified(provider.id, provider.background_verified)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                            provider.background_verified
+                              ? 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                              : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
+                          }`}
+                          title="Antecedentes verificado (récord policial)"
+                        >
+                          <ShieldCheck className="w-3 h-3 inline mr-1" />
+                          Antecedentes
+                        </button>
+                        <select
+                          value={provider.plan || 'free'}
+                          onChange={(e) => setPlan(provider.id, e.target.value)}
+                          title="Plan (facturación manual)"
+                          className="px-2 py-1 rounded-lg text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                          <option value="free">Plan: Gratis</option>
+                          <option value="listed">Plan: Listado (pagado)</option>
+                          <option value="featured">Plan: Destacado (pagado)</option>
+                        </select>
                       </div>
                     </td>
                     <td className="px-5 py-3.5">
@@ -540,6 +657,13 @@ export default function AdminProvidersPage() {
                           title="Foto de tarjeta"
                         >
                           <ImageIcon className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => copyReviewLink(provider.slug)}
+                          className="p-2 rounded-xl text-green-600 bg-green-50 hover:bg-green-100 transition-colors"
+                          title="Copiar link de reseña"
+                        >
+                          <MessageSquarePlus className="w-4 h-4" />
                         </button>
                         <Link href={`/admin/providers/${provider.id}/edit`}>
                           <button className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors">

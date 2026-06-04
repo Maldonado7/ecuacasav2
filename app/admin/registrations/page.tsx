@@ -22,6 +22,13 @@ interface Registration {
   areas_served: string[] | null;
   speaks_english: boolean;
   message: string | null;
+  kind: 'individual' | 'company' | null;
+  company_name: string | null;
+  ruc: string | null;
+  business_hours: string | null;
+  background_cert_url: string | null;
+  background_cert_code: string | null;
+  background_cert_date: string | null;
   cedula_number: string | null;
   cedula_photo_url: string | null;
   profile_photo_url: string | null;
@@ -272,7 +279,25 @@ export default function AdminRegistrationsPage() {
                         </div>
                       )}
 
-                      {reg.cedula_number && (
+                      {reg.kind === 'company' && (
+                        <div className="text-sm text-gray-500 mb-3 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center rounded-full bg-purple-50 px-2 py-0.5 text-xs font-semibold text-purple-700">Empresa</span>
+                            {reg.company_name && <span className="font-medium text-gray-700">{reg.company_name}</span>}
+                          </div>
+                          {reg.ruc && (
+                            <div className="flex items-center gap-2">
+                              <CreditCard className="w-3.5 h-3.5" />
+                              <span className="font-medium text-gray-700">RUC:</span> {reg.ruc}
+                            </div>
+                          )}
+                          {reg.business_hours && (
+                            <div><span className="font-medium text-gray-700">Horario:</span> {reg.business_hours}</div>
+                          )}
+                        </div>
+                      )}
+
+                      {reg.kind !== 'company' && reg.cedula_number && (
                         <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                           <CreditCard className="w-3.5 h-3.5" />
                           <span className="font-medium text-gray-700">Cédula:</span> {reg.cedula_number}
@@ -298,6 +323,31 @@ export default function AdminRegistrationsPage() {
                               <p className="text-[10px] text-gray-400 mt-1 text-center font-medium">Cédula</p>
                             </a>
                           )}
+                        </div>
+                      )}
+
+                      {/* Optional background certificate (voluntary). Verify the
+                          code remotely at the government portal; expires 90 days
+                          after the issue date. */}
+                      {(reg.background_cert_url || reg.background_cert_code) && (
+                        <div className="bg-green-50/60 border border-green-100 rounded-xl p-3 mb-3 text-sm">
+                          <p className="text-xs font-medium text-gray-500 mb-1.5">Récord policial (opcional)</p>
+                          {reg.background_cert_code && (
+                            <div className="text-gray-700"><span className="font-medium">Código:</span> {reg.background_cert_code}</div>
+                          )}
+                          {reg.background_cert_date && (
+                            <div className="text-gray-700"><span className="font-medium">Emitido:</span> {reg.background_cert_date} <span className="text-gray-400">(vence 90 días después)</span></div>
+                          )}
+                          <div className="flex gap-3 mt-1.5">
+                            {reg.background_cert_url && (
+                              <a href={storageProxyUrl(reg.background_cert_url)} target="_blank" rel="noopener noreferrer" className="text-green-700 font-medium hover:underline">
+                                Ver certificado
+                              </a>
+                            )}
+                            <a href="https://certificados.ministeriodegobierno.gob.ec/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                              Portal de verificación
+                            </a>
+                          </div>
                         </div>
                       )}
 

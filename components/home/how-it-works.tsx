@@ -99,7 +99,7 @@ export function HowItWorks() {
         {/* CTA */}
         <div className="text-center mt-6 sm:mt-16">
           <a
-            href="/solicitar"
+            href="/providers"
             className="inline-block px-6 sm:px-10 py-2.5 sm:py-4 bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white font-semibold text-sm sm:text-base rounded-xl transition-all shadow-lg hover:shadow-xl hover:scale-105 duration-300"
           >
             {t('how_it_works.cta')}

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { RatingStars } from '@/components/shared/rating-stars';
+import { ProviderRating } from '@/components/shared/provider-rating';
 import { WhatsAppButton } from '@/components/shared/whatsapp-button';
 import { useTranslation } from '@/hooks/use-translation';
 import { getLocalizedField } from '@/lib/i18n/helpers';
@@ -71,7 +71,10 @@ export function FeaturedProviders({ providers }: FeaturedProvidersProps) {
                     )}
                     {/* Verified Badge Overlay */}
                     {provider.verified && (
-                      <div className="absolute top-3 right-3 bg-green-500 text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-medium shadow-lg">
+                      <div
+                        title={t('providers.verified_tooltip')}
+                        className="absolute top-3 right-3 bg-green-500 text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-medium shadow-lg cursor-help"
+                      >
                         <CheckCircle className="w-3.5 h-3.5" />
                         {t('providers.verified')}
                       </div>
@@ -98,10 +101,11 @@ export function FeaturedProviders({ providers }: FeaturedProvidersProps) {
                   {/* Key Stats - Only 5 data points */}
                   <div className="space-y-2 mb-4">
                     {/* Rating */}
-                    <div className="flex items-center gap-2">
-                      <RatingStars rating={provider.rating} size="sm" showValue />
-                      <span className="text-sm text-gray-500">({provider.review_count})</span>
-                    </div>
+                    <ProviderRating
+                      rating={provider.rating}
+                      reviewCount={provider.review_count}
+                      newLabel={t('providers.new')}
+                    />
 
                     {/* Response Time & Price */}
                     <div className="flex items-center justify-between text-sm">

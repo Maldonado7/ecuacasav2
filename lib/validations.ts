@@ -31,6 +31,52 @@ export function isValidEcuadorCedula(cedula: string): boolean {
   return checkDigit === parseInt(cedula[9], 10);
 }
 
+// Ecuador RUC validation (13 digits). Covers the three RUC types:
+//  - Natural person (3rd digit 0-5): first 10 digits are a valid cédula,
+//    last 3 digits are the establishment code (>= 001).
+//  - Private/juridical company (3rd digit 9): modulus-11 check on first 9
+//    digits with check digit in position 10, then establishment >= 001.
+//  - Public entity (3rd digit 6): modulus-11 check on first 8 digits with
+//    check digit in position 9, then establishment >= 0001.
+export function isValidEcuadorRuc(ruc: string): boolean {
+  if (!/^\d{13}$/.test(ruc)) return false;
+
+  const province = parseInt(ruc.substring(0, 2), 10);
+  if ((province < 1 || province > 24) && province !== 30) return false;
+
+  const thirdDigit = parseInt(ruc[2], 10);
+
+  // Natural person RUC: first 10 digits must be a valid cédula
+  if (thirdDigit < 6) {
+    if (!isValidEcuadorCedula(ruc.substring(0, 10))) return false;
+    return parseInt(ruc.substring(10), 10) >= 1;
+  }
+
+  // Private/juridical company RUC
+  if (thirdDigit === 9) {
+    const coefficients = [4, 3, 2, 7, 6, 5, 4, 3, 2];
+    let total = 0;
+    for (let i = 0; i < 9; i++) total += parseInt(ruc[i], 10) * coefficients[i];
+    const remainder = total % 11;
+    const checkDigit = remainder === 0 ? 0 : 11 - remainder;
+    if (checkDigit !== parseInt(ruc[9], 10)) return false;
+    return parseInt(ruc.substring(10), 10) >= 1;
+  }
+
+  // Public entity RUC
+  if (thirdDigit === 6) {
+    const coefficients = [3, 2, 7, 6, 5, 4, 3, 2];
+    let total = 0;
+    for (let i = 0; i < 8; i++) total += parseInt(ruc[i], 10) * coefficients[i];
+    const remainder = total % 11;
+    const checkDigit = remainder === 0 ? 0 : 11 - remainder;
+    if (checkDigit !== parseInt(ruc[8], 10)) return false;
+    return parseInt(ruc.substring(9), 10) >= 1;
+  }
+
+  return false;
+}
+
 // Ecuador phone number validation — accepts 09XXXXXXXX or +593XXXXXXXXX
 const ecuadorPhoneRegex = /^(09\d{8}|\+593\d{9})$/;
 
