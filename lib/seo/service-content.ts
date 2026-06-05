@@ -22,7 +22,7 @@ export const SERVICE_CONTENT: Record<string, ServiceSEOContent> = {
     h1: 'Plomeros en Cuenca — Servicio a Domicilio',
     metaTitle: 'Plomeros en Cuenca Ecuador | Plomería a Domicilio Verificada',
     metaDescription:
-      'Encuentra plomeros verificados en Cuenca. Reparaciones, instalaciones, emergencias 24h. Servicio a domicilio con respuesta en 2 horas. Presupuesto sin compromiso.',
+      'Encuentra plomeros verificados en Cuenca. Reparaciones, instalaciones, emergencias 24h. Contáctalos directamente por WhatsApp. Presupuesto sin compromiso.',
     content: `
 Encontrar un plomero confiable en Cuenca puede ser complicado, especialmente si acabas de mudarte a la ciudad. En EcuaCasa conectamos a residentes y expatriados con plomeros verificados que ofrecen servicio a domicilio en toda la ciudad, incluyendo el Centro Histórico, El Vergel, Yanuncay, Misicata y Totoracocha.
 
@@ -32,7 +32,7 @@ Los servicios más solicitados incluyen: reparación de fugas y goteras, instala
 
 Todos los profesionales en nuestra plataforma pasan por un proceso de verificación que incluye revisión de identidad, experiencia comprobada y referencias de clientes anteriores. Puedes ver las calificaciones y reseñas de cada plomero antes de contactarlo.
 
-¿Cómo funciona? Simplemente solicita el servicio, describe tu problema y te conectamos con un plomero verificado en menos de 2 horas. Recibes un presupuesto sin compromiso y tú decides si continúas. Sin intermediarios, sin costos ocultos.
+¿Cómo funciona? Explora los plomeros verificados abajo y contáctalos directamente por WhatsApp para coordinar tu servicio. Pide tu presupuesto sin compromiso y tú decides con quién trabajar. Sin intermediarios, sin costos ocultos.
     `.trim(),
     faqs: [
       {
@@ -48,7 +48,7 @@ Todos los profesionales en nuestra plataforma pasan por un proceso de verificaci
       {
         question: '¿Hay plomeros de emergencia disponibles 24 horas en Cuenca?',
         answer:
-          'Sí, en EcuaCasa contamos con plomeros disponibles para emergencias en Cuenca. Puedes solicitar servicio de plomería urgente a cualquier hora y te conectamos con un profesional verificado lo antes posible. El tiempo promedio de respuesta es de menos de 2 horas.',
+          'Sí, en EcuaCasa contamos con plomeros disponibles para emergencias en Cuenca. Puedes contactar directamente a un plomero verificado a cualquier hora por WhatsApp. Muchos atienden emergencias y suelen responder en poco tiempo.',
       },
       {
         question: '¿Qué problemas de plomería son comunes en casas de Cuenca?',
@@ -68,7 +68,7 @@ Todos los profesionales en nuestra plataforma pasan por un proceso de verificaci
     metaDescription:
       'Carpinteros verificados en Cuenca. Muebles a medida, closets, puertas, cocinas, reparaciones de madera. Servicio a domicilio con presupuesto sin compromiso.',
     content: `
-La carpintería en Cuenca tiene una tradición artesanal que se refleja en cada hogar de la ciudad. Ya sea que necesites muebles a medida, reparación de puertas en casas del Centro Histórico o un closet nuevo para tu departamento en El Vergel, en EcuaCasa te conectamos con carpinteros verificados que trabajan con calidad y compromiso.
+La carpintería en Cuenca tiene una tradición artesanal que se refleja en cada hogar de la ciudad. Ya sea que necesites muebles a medida, reparación de puertas en casas del Centro Histórico o un closet nuevo para tu departamento en El Vergel, en EcuaCasa encuentras carpinteros verificados que trabajan con calidad y compromiso.
 
 Nuestros carpinteros ofrecen servicios en toda la ciudad: desde Yanuncay y Misicata hasta Totoracocha, Monay y barrios residenciales como Puertas del Sol. Conocen los materiales disponibles en el mercado local y trabajan con maderas como laurel, seike, chanul y MDF según las necesidades de cada proyecto.
 
@@ -76,7 +76,7 @@ Los servicios de carpintería más solicitados en Cuenca incluyen: fabricación 
 
 Si vives en una casa antigua del Centro Histórico de Cuenca, sabemos que mantener las puertas, ventanas y molduras originales requiere manos expertas. Nuestros carpinteros tienen experiencia en restauración y conservación de elementos de madera en edificaciones patrimoniales.
 
-Todos los carpinteros en EcuaCasa están verificados. Puedes revisar sus calificaciones, ver fotos de trabajos anteriores y solicitar un presupuesto sin compromiso. Te conectamos con el profesional ideal en menos de 2 horas.
+¿Cómo funciona? Explora los carpinteros verificados abajo y contáctalos directamente por WhatsApp para coordinar tu servicio. Revisa sus calificaciones, pide un presupuesto sin compromiso y tú decides con quién trabajar. Sin intermediarios, sin costos ocultos.
     `.trim(),
     faqs: [
       {
@@ -97,7 +97,7 @@ Todos los carpinteros en EcuaCasa están verificados. Puedes revisar sus calific
       {
         question: '¿Cómo encontrar un buen carpintero a domicilio en Cuenca?',
         answer:
-          'En EcuaCasa verificamos la identidad y experiencia de cada carpintero antes de que pueda ofrecer sus servicios. Puedes ver calificaciones de otros clientes, fotos de trabajos anteriores y solicitar presupuestos sin compromiso. Te conectamos con el carpintero ideal para tu proyecto en menos de 2 horas.',
+          'En EcuaCasa verificamos la identidad y experiencia de cada carpintero antes de que pueda ofrecer sus servicios. Puedes ver calificaciones de otros clientes, fotos de trabajos anteriores y pedir presupuestos sin compromiso. Contacta directamente al carpintero ideal para tu proyecto por WhatsApp.',
       },
     ],
     relatedServices: [
@@ -112,7 +112,7 @@ Todos los carpinteros en EcuaCasa están verificados. Puedes revisar sus calific
     metaDescription:
       'Pintores verificados en Cuenca. Pintura interior, exterior, fachadas, impermeabilización. Servicio profesional a domicilio. Presupuesto sin compromiso.',
     content: `
-¿Necesitas pintar tu casa o departamento en Cuenca? En EcuaCasa te conectamos con pintores profesionales verificados que ofrecen servicio a domicilio en toda la ciudad. Desde el Centro Histórico hasta El Vergel, Yanuncay, Misicata y Totoracocha, nuestros pintores conocen las particularidades del clima cuencano y los mejores productos para cada superficie.
+¿Necesitas pintar tu casa o departamento en Cuenca? En EcuaCasa encuentras pintores profesionales verificados que ofrecen servicio a domicilio en toda la ciudad. Desde el Centro Histórico hasta El Vergel, Yanuncay, Misicata y Totoracocha, nuestros pintores conocen las particularidades del clima cuencano y los mejores productos para cada superficie.
 
 El clima de Cuenca presenta desafíos específicos para la pintura. La humedad frecuente, las lluvias y los cambios de temperatura pueden afectar la durabilidad de la pintura si no se usan los productos adecuados. Nuestros pintores recomiendan pinturas con protección anti-humedad para interiores y pinturas elastomérica o impermeabilizante para fachadas exteriores.
 
@@ -120,7 +120,7 @@ Los servicios de pintura más solicitados incluyen: pintura interior de casas y 
 
 Si tu propiedad está en el Centro Histórico de Cuenca, es importante trabajar con pintores que conozcan las regulaciones municipales sobre colores y acabados permitidos en fachadas patrimoniales. Nuestros profesionales tienen experiencia con estos requerimientos.
 
-Todos los pintores en EcuaCasa están verificados y puedes ver sus calificaciones antes de contratarlos. Solicita el servicio, recibe un presupuesto sin compromiso y un profesional se pone en contacto contigo en menos de 2 horas.
+¿Cómo funciona? Explora los pintores verificados abajo y contáctalos directamente por WhatsApp para coordinar tu servicio. Mira sus calificaciones, pide un presupuesto sin compromiso y tú decides con quién trabajar. Sin intermediarios, sin costos ocultos.
     `.trim(),
     faqs: [
       {
@@ -141,7 +141,7 @@ Todos los pintores en EcuaCasa están verificados y puedes ver sus calificacione
       {
         question: '¿Cómo encontrar pintores confiables en Cuenca?',
         answer:
-          'En EcuaCasa todos los pintores pasan por un proceso de verificación de identidad y experiencia. Puedes ver las calificaciones y reseñas de otros clientes, comparar perfiles y solicitar presupuestos sin compromiso. Te conectamos con un pintor verificado en menos de 2 horas, sin intermediarios ni costos ocultos.',
+          'En EcuaCasa todos los pintores pasan por un proceso de verificación de identidad y experiencia. Puedes ver las calificaciones y reseñas de otros clientes, comparar perfiles y pedir presupuestos sin compromiso. Contacta directamente a un pintor verificado por WhatsApp, sin intermediarios ni costos ocultos.',
       },
     ],
     relatedServices: [

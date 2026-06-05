@@ -133,7 +133,10 @@ export const providersRepository = {
         )
       `)
       .eq('services.service.slug', serviceSlug)
-      .order('rating', { ascending: false });
+      .eq('status', 'active')
+      .order('verified', { ascending: false })
+      .order('rating', { ascending: false })
+      .limit(6);
 
     if (error) {
       console.error(`Error fetching providers for service ${serviceSlug}:`, error);

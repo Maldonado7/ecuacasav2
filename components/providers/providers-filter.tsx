@@ -1,17 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ProviderRating } from '@/components/shared/provider-rating';
-import { WhatsAppButton } from '@/components/shared/whatsapp-button';
+import { ProviderCard } from '@/components/providers/provider-card';
 import { useTranslation } from '@/hooks/use-translation';
 import { getLocalizedField } from '@/lib/i18n/helpers';
-import { getProviderPlaceholder, getBlurDataURL } from '@/lib/utils/placeholders';
-import { CheckCircle, Clock, Filter, X } from 'lucide-react';
+import { Filter, X } from 'lucide-react';
 import { trackSearch } from '@/lib/analytics';
 
 interface Provider {
@@ -45,7 +39,7 @@ interface ProvidersFilterProps {
 }
 
 export function ProvidersFilter({ providers, services, initialService = '' }: ProvidersFilterProps) {
-  const { locale, t } = useTranslation();
+  const { locale } = useTranslation();
   const [filters, setFilters] = useState({
     service: initialService,
     speaksEnglish: false,
@@ -120,96 +114,7 @@ export function ProvidersFilter({ providers, services, initialService = '' }: Pr
       {filteredProviders.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProviders.map((provider) => (
-            <Card key={provider.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-accent-200">
-              <CardContent className="p-0">
-                <Link href={`/providers/${provider.slug}`}>
-                  <div className="relative h-48 w-full bg-gradient-to-br from-primary-50 to-blue-100 overflow-hidden">
-                    {provider.photo_url ? (
-                      <img
-                        src={`/api/providers/${provider.id}/photo`}
-                        alt={provider.name}
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <Image
-                        src={getProviderPlaceholder(provider.name)}
-                        alt={provider.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        placeholder="blur"
-                        blurDataURL={getBlurDataURL()}
-                      />
-                    )}
-                    <div className="absolute top-3 right-3 flex flex-col gap-2">
-                      {provider.verified && (
-                        <div
-                          title={t('providers.verified_tooltip')}
-                          className="bg-success text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-medium shadow-lg cursor-help"
-                        >
-                          <CheckCircle className="w-3.5 h-3.5" />
-                          Verificado
-                        </div>
-                      )}
-                      {provider.featured && (
-                        <div className="bg-accent-500 text-white px-2.5 py-1 rounded-full text-xs font-medium shadow-lg">
-                          Destacado
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-
-                <div className="p-5">
-                  <Link href={`/providers/${provider.slug}`}>
-                    <h3 className="text-xl font-bold text-gray-900 hover:text-accent-600 transition-colors mb-2">
-                      {provider.name}
-                    </h3>
-                  </Link>
-
-                  {provider.services.length > 0 && (
-                    <p className="text-sm text-gray-600 mb-3">
-                      {getLocalizedField(provider.services[0], 'name', locale)}
-                      {provider.services.length > 1 && ` +${provider.services.length - 1}`}
-                    </p>
-                  )}
-
-                  <div className="space-y-2 mb-4">
-                    <ProviderRating
-                      rating={provider.rating}
-                      reviewCount={provider.review_count}
-                      newLabel={t('providers.new')}
-                    />
-
-                    <div className="flex items-center justify-between text-sm">
-                      {provider.response_time && (
-                        <div className="flex items-center gap-1.5 text-gray-600">
-                          <Clock className="w-4 h-4" />
-                          <span>{provider.response_time}</span>
-                        </div>
-                      )}
-                      {provider.price_range && (
-                        <span className="font-semibold text-gray-900">{provider.price_range}</span>
-                      )}
-                    </div>
-
-                    {provider.speaks_english && (
-                      <Badge variant="outline" className="text-xs border-accent-300 text-accent-700 bg-accent-50">
-                        Habla Inglés
-                      </Badge>
-                    )}
-                  </div>
-
-                  <WhatsAppButton
-                    providerName={provider.name}
-                    phoneNumber={provider.phone}
-                    providerId={provider.id}
-                    serviceName={provider.services[0]?.name_en}
-                    size="sm"
-                    className="w-full"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+            <ProviderCard key={provider.id} provider={provider} />
           ))}
         </div>
       ) : (

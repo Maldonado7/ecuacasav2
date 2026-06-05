@@ -10,10 +10,10 @@ export const revalidate = 3600;
 
 export const metadata = {
   title: 'Servicios para el Hogar en Cuenca Ecuador | Limpieza, Electricidad, Plomería',
-  description: 'Profesionales verificados para servicios del hogar en Cuenca. Limpieza, electricidad, plomería, carpintería, jardinería, pintura y más. Respuesta en menos de 2 horas.',
+  description: 'Profesionales verificados para servicios del hogar en Cuenca. Limpieza, electricidad, plomería, carpintería, jardinería, pintura y más. Contáctalos directamente por WhatsApp.',
   openGraph: {
     title: 'Servicios para el Hogar en Cuenca Ecuador | Limpieza, Electricidad, Plomería',
-    description: 'Profesionales verificados para servicios del hogar en Cuenca. Limpieza, electricidad, plomería, carpintería, jardinería, pintura y más. Respuesta en menos de 2 horas.',
+    description: 'Profesionales verificados para servicios del hogar en Cuenca. Limpieza, electricidad, plomería, carpintería, jardinería, pintura y más. Contáctalos directamente por WhatsApp.',
     url: 'https://ecuacasa.com/services',
   },
   alternates: {

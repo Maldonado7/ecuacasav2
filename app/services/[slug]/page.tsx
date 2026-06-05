@@ -1,16 +1,11 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ServiceJsonLd, BreadcrumbJsonLd, FAQJsonLd } from '@/components/seo/json-ld';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ProviderRating } from '@/components/shared/provider-rating';
-import { WhatsAppButton } from '@/components/shared/whatsapp-button';
+import { ProviderCard } from '@/components/providers/provider-card';
 import { servicesRepository, providersRepository } from '@/lib/repositories';
 import { SERVICE_ICONS, DEFAULT_SERVICE_ICON } from '@/lib/constants';
-import { getProviderPlaceholder, getBlurDataURL } from '@/lib/utils/placeholders';
 import { getServiceContent } from '@/lib/seo/service-content';
-import { CheckCircle, Clock, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 interface ServicePageProps {
   params: Promise<{ slug: string }>;
@@ -24,7 +19,7 @@ const SERVICE_SEO: Record<string, { title: string; description: string }> = {
   },
   electricidad: {
     title: 'Electricistas en Cuenca Ecuador | Servicio Eléctrico a Domicilio',
-    description: 'Electricistas verificados en Cuenca. Instalaciones, reparaciones, emergencias. Servicio a domicilio profesional. Respuesta en 2 horas.',
+    description: 'Electricistas verificados en Cuenca. Instalaciones, reparaciones, emergencias. Contáctalos directamente por WhatsApp. Servicio a domicilio profesional.',
   },
   jardineria: {
     title: 'Jardineros en Cuenca Ecuador | Jardinería y Mantenimiento',
@@ -32,7 +27,7 @@ const SERVICE_SEO: Record<string, { title: string; description: string }> = {
   },
   handyman: {
     title: 'Handyman Services in Cuenca Ecuador | Verified Professionals',
-    description: 'Verified handyman services in Cuenca. Home repairs, maintenance, installations. Response in under 2 hours. No commitment.',
+    description: 'Verified handyman services in Cuenca. Home repairs, maintenance, installations. Contact them directly on WhatsApp. No commitment.',
   },
 };
 
@@ -131,21 +126,21 @@ export default async function ServicePage({ params }: ServicePageProps) {
           </ol>
         </nav>
 
-        {/* Request Service Banner */}
+        {/* Direct Contact Banner */}
         <div className="mb-8 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-100 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-bold text-gray-900">
               ¿Necesitas {service.name_es}?
             </h2>
             <p className="text-gray-600 text-sm">
-              Solicita y te conectamos con un profesional verificado en 2 horas
+              Contacta directamente a un profesional verificado en Cuenca. Sin intermediarios.
             </p>
           </div>
           <Link
             href={`/providers?service=${service.slug}`}
             className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all whitespace-nowrap"
           >
-            Solicitar Servicio
+            Ver profesionales de {service.name_es.toLowerCase()}
           </Link>
         </div>
 
@@ -191,77 +186,11 @@ export default async function ServicePage({ params }: ServicePageProps) {
         {providers.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {providers.map((provider) => (
-              <Card key={provider.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-accent-200">
-                <CardContent className="p-0">
-                  {/* Provider Photo */}
-                  <Link href={`/providers/${provider.slug}`}>
-                    <div className="relative h-48 w-full bg-gradient-to-br from-primary-50 to-blue-100 overflow-hidden">
-                      <Image
-                        src={getProviderPlaceholder(provider.name)}
-                        alt={`${provider.name} — ${service.name_es} verificado en Cuenca`}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        placeholder="blur"
-                        blurDataURL={getBlurDataURL()}
-                      />
-                      {/* Verified Badge Overlay */}
-                      {provider.verified && (
-                        <div
-                          title="Identidad (cédula o RUC) verificada y referencias o negocio confirmados por nuestro equipo."
-                          className="absolute top-3 right-3 bg-success text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-medium shadow-lg cursor-help"
-                        >
-                          <CheckCircle className="w-3.5 h-3.5" />
-                          Verificado
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-
-                  {/* Content */}
-                  <div className="p-5">
-                    <Link href={`/providers/${provider.slug}`}>
-                      <h3 className="text-xl font-bold text-gray-900 hover:text-accent-600 transition-colors mb-2">
-                        {provider.name}
-                      </h3>
-                    </Link>
-
-                    {/* Key Stats */}
-                    <div className="space-y-2 mb-4">
-                      {/* Rating */}
-                      <ProviderRating
-                        rating={provider.rating}
-                        reviewCount={provider.review_count}
-                      />
-
-                      {/* Response Time & Price */}
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-1.5 text-gray-600">
-                          <Clock className="w-4 h-4" />
-                          <span>{provider.response_time}</span>
-                        </div>
-                        <span className="font-semibold text-gray-900">{provider.price_range}</span>
-                      </div>
-
-                      {/* Speaks English Badge */}
-                      {provider.speaks_english && (
-                        <Badge variant="outline" className="text-xs border-accent-300 text-accent-700 bg-accent-50">
-                          Habla Inglés
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* WhatsApp Button */}
-                    <WhatsAppButton
-                      providerName={provider.name}
-                      phoneNumber={provider.phone}
-                      providerId={provider.id}
-                      serviceName={service.name_en}
-                      size="sm"
-                      className="w-full"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+              <ProviderCard
+                key={provider.id}
+                provider={provider}
+                serviceNameEn={service.name_en}
+              />
             ))}
           </div>
         ) : (
@@ -270,16 +199,16 @@ export default async function ServicePage({ params }: ServicePageProps) {
               <Icon className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No hay profesionales disponibles
+              Aún no hay profesionales de {service.name_es.toLowerCase()} en esta categoría
             </h3>
             <p className="text-gray-600 mb-6">
-              Aún no tenemos profesionales registrados para este servicio.
+              Explora todos nuestros profesionales verificados en Cuenca y contáctalos directamente por WhatsApp.
             </p>
             <Link
-              href={`/providers?service=${service.slug}`}
+              href="/providers"
               className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-lg transition-colors"
             >
-              Solicitar este servicio
+              Ver todos los profesionales
             </Link>
           </div>
         )}
